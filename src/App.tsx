@@ -22,6 +22,7 @@ const Dashboard = createLazyRoute(() => import("./pages/Dashboard"), "dashboard"
 const ImageGridDemo = createLazyRoute(() => import("./pages/ImageGridDemo"), "image grid demo");
 const InteractionsStyleGuide = createLazyRoute(() => import("./components/interactions/InteractionsStyleGuide"), "style guide");
 const TermsOfService = createLazyRoute(() => import("./pages/TermsOfService"), "terms of service");
+const TestLogin = createLazyRoute(() => import("./pages/TestLogin"), "test login");
 
 const queryClient = new QueryClient();
 
@@ -58,6 +59,9 @@ function AppRoutes() {
 
       {/* Legal pages */}
       <Route path="/terms" element={<TermsOfService />} />
+
+      {/* Test login route - for E2E testing only */}
+      <Route path="/test-login" element={<TestLogin />} />
       
       {/* Protected routes */}
       <Route 

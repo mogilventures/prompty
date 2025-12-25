@@ -1,0 +1,92 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - region "Notifications alt+T"
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - link "Prompty home" [ref=e5] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e6] [cursor=pointer]: Prompty
+      - navigation [ref=e7]:
+        - menubar [ref=e9]:
+          - menuitem "Account" [ref=e10]
+  - main [ref=e11]:
+    - heading "User Dashboard" [level=1] [ref=e12]
+    - generic [ref=e13]:
+      - generic [ref=e14]:
+        - paragraph [ref=e15]: Welcome back
+        - paragraph [ref=e16]: e2e_host_17645899571!
+        - paragraph [ref=e17]: 12/1/2025, 11:52:39 AM
+      - button "Sign out" [ref=e20] [cursor=pointer]:
+        - img [ref=e21] [cursor=pointer]
+        - text: Sign Out
+    - region "Quick Actions" [ref=e24]:
+      - heading "Quick Actions" [level=2] [ref=e25]
+      - generic [ref=e26]:
+        - button "Create a new room" [ref=e28] [cursor=pointer]:
+          - img [ref=e30] [cursor=pointer]
+          - heading "Create New Room" [level=3] [ref=e31] [cursor=pointer]
+          - paragraph [ref=e32] [cursor=pointer]: Start a new game
+        - button "Join a room" [ref=e34] [cursor=pointer]:
+          - img [ref=e36] [cursor=pointer]
+          - heading "Join Room" [level=3] [ref=e39] [cursor=pointer]
+          - paragraph [ref=e40] [cursor=pointer]: Enter a room code
+        - button "Browse public rooms" [ref=e42] [cursor=pointer]:
+          - img [ref=e44] [cursor=pointer]
+          - heading "Public Rooms" [level=3] [ref=e46] [cursor=pointer]
+          - paragraph [ref=e47] [cursor=pointer]: Find a game to join
+    - region "Your Stats" [ref=e48]:
+      - heading "Your Stats" [level=2] [ref=e49]
+      - generic [ref=e50]:
+        - generic [ref=e52]:
+          - paragraph [ref=e53]: Games Played
+          - heading "0" [level=3] [ref=e54]
+        - generic [ref=e56]:
+          - paragraph [ref=e57]: Games Won
+          - heading "0" [level=3] [ref=e58]
+        - generic [ref=e60]:
+          - paragraph [ref=e61]: Images Created
+          - heading "0" [level=3] [ref=e62]
+        - generic [ref=e64]:
+          - paragraph [ref=e65]: Win Rate
+          - heading "0%" [level=3] [ref=e66]
+    - region "Recent Games" [ref=e67]:
+      - generic [ref=e68]:
+        - heading "Recent Games" [level=2] [ref=e69]
+        - link "View all" [ref=e70] [cursor=pointer]:
+          - /url: /app/dashboard
+      - generic [ref=e71]:
+        - article [ref=e72]:
+          - generic [ref=e73]:
+            - generic [ref=e74]:
+              - heading "Jan 15, 2024" [level=3] [ref=e75]
+              - paragraph [ref=e76]: 5 players • 1st place
+            - button "View game details" [ref=e78] [cursor=pointer]: View details
+        - article [ref=e79]:
+          - generic [ref=e80]:
+            - generic [ref=e81]:
+              - heading "Jan 14, 2024" [level=3] [ref=e82]
+              - paragraph [ref=e83]: 4 players • 3rd place
+            - button "View game details" [ref=e85] [cursor=pointer]: View details
+        - article [ref=e86]:
+          - generic [ref=e87]:
+            - generic [ref=e88]:
+              - heading "Jan 13, 2024" [level=3] [ref=e89]
+              - paragraph [ref=e90]: 6 players • 2nd place
+            - button "View game details" [ref=e92] [cursor=pointer]: View details
+        - article [ref=e93]:
+          - generic [ref=e94]:
+            - generic [ref=e95]:
+              - heading "Jan 12, 2024" [level=3] [ref=e96]
+              - paragraph [ref=e97]: 3 players • 1st place
+            - button "View game details" [ref=e99] [cursor=pointer]: View details
+        - article [ref=e100]:
+          - generic [ref=e101]:
+            - generic [ref=e102]:
+              - heading "Jan 11, 2024" [level=3] [ref=e103]
+              - paragraph [ref=e104]: 7 players • 4th place
+            - button "View game details" [ref=e106] [cursor=pointer]: View details
+```

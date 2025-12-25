@@ -176,10 +176,11 @@ const Room = () => {
               <div>
                 <CardTitle className="text-2xl">{room.name}</CardTitle>
                 <div className="flex items-center gap-2 mt-2">
-                  <Badge 
-                    variant="outline" 
+                  <Badge
+                    variant="outline"
                     className="text-lg px-4 py-2 font-mono cursor-pointer"
                     onClick={handleCopyCode}
+                    data-testid="room-code"
                   >
                     {room.code}
                   </Badge>
@@ -245,7 +246,7 @@ const Room = () => {
           </Card>
           <Card className="p-4 text-center">
             <p className="text-sm text-muted-foreground">Players</p>
-            <p className="text-2xl font-bold mt-1">
+            <p className="text-2xl font-bold mt-1" data-testid="player-count">
               {connectedPlayers.length}/{room.settings.maxPlayers}
             </p>
           </Card>

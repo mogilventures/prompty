@@ -9,6 +9,13 @@ import { internal } from "./_generated/api";
 import { GAME_CONFIG } from "./lib/constants";
 import { Id } from "./_generated/dataModel";
 import { getAuthUserId } from "@convex-dev/auth/server";
+import {
+  calculateVotingEligibility,
+  haveAllEligiblePlayersVoted,
+  calculateRoundScores,
+  countVotesPerImage,
+  findWinningImages,
+} from "./lib/gameLogic";
 
 // Start the game (called by host)
 export const startGame = mutation({
@@ -181,13 +188,14 @@ export const submitPrompt = mutation({
     if (!room || !room.currentRound) {
       throw new Error("No active round");
     }
+    const currentRoundNumber = room.currentRound;
 
-    console.log(`[submitPrompt] Room found: ${room.name}, Current round: ${room.currentRound}`);
+    console.log(`[submitPrompt] Room found: ${room.name}, Current round: ${currentRoundNumber}`);
 
     const round = await ctx.db
       .query("rounds")
       .withIndex("by_room_and_number", (q) =>
-        q.eq("roomId", args.roomId).eq("roundNumber", room.currentRound)
+        q.eq("roomId", args.roomId).eq("roundNumber", currentRoundNumber)
       )
       .unique();
 
@@ -248,6 +256,17 @@ export const submitPrompt = mutation({
   },
 });
 
+// Helper function to get expected phase duration
+function getPhaseDuration(status: string): number {
+  switch (status) {
+    case "prompt": return GAME_CONFIG.PROMPT_PHASE_DURATION;
+    case "generating": return GAME_CONFIG.GENERATION_PHASE_DURATION;
+    case "voting": return GAME_CONFIG.VOTING_PHASE_DURATION;
+    case "results": return GAME_CONFIG.RESULTS_PHASE_DURATION;
+    default: return 0;
+  }
+}
+
 // Transition game phases
 export const transitionPhase = internalMutation({
   args: {
@@ -264,6 +283,21 @@ export const transitionPhase = internalMutation({
     }
 
     console.log(`[transitionPhase] Round ${args.roundId} current status: ${round.status}`);
+
+    // Prevent race condition: don't transition if the phase JUST started
+    // This handles cases where multiple transition triggers fire simultaneously
+    // (e.g., both storeGeneratedImage and markGenerationComplete calling checkAllImagesGenerated)
+    const MINIMUM_PHASE_DURATION_MS = 1000; // 1 second minimum
+    if (round.phaseEndTime && round.status !== "generating" && round.status !== "complete") {
+      const phaseDuration = getPhaseDuration(round.status);
+      const phaseStartTime = round.phaseEndTime - phaseDuration;
+      const timeInPhase = Date.now() - phaseStartTime;
+
+      if (timeInPhase < MINIMUM_PHASE_DURATION_MS) {
+        console.log(`[transitionPhase] Ignoring duplicate transition - phase ${round.status} only ${timeInPhase}ms old (minimum: ${MINIMUM_PHASE_DURATION_MS}ms)`);
+        return null;
+      }
+    }
 
     // Clear the scheduled transition ID to indicate this transition is being processed
     // This prevents duplicate transitions if multiple calls happen simultaneously
@@ -676,13 +710,14 @@ export const submitVote = mutation({
       console.error(`[submitVote] ERROR: No active round in room ${args.roomId}`);
       throw new Error("No active round");
     }
+    const currentRoundNumber = room.currentRound;
 
-    console.log(`[submitVote] Current round number: ${room.currentRound}`);
+    console.log(`[submitVote] Current round number: ${currentRoundNumber}`);
 
     const round = await ctx.db
       .query("rounds")
       .withIndex("by_room_and_number", (q) =>
-        q.eq("roomId", args.roomId).eq("roundNumber", room.currentRound)
+        q.eq("roomId", args.roomId).eq("roundNumber", currentRoundNumber)
       )
       .unique();
 
@@ -760,56 +795,57 @@ export const calculateScores = internalMutation({
   handler: async (ctx, args) => {
     const round = await ctx.db.get(args.roundId);
     if (!round) return null;
-    
+
     // Get all votes for this round
     const votes = await ctx.db
       .query("votes")
       .withIndex("by_round", (q) => q.eq("roundId", args.roundId))
       .collect();
-    
-    // Count votes per image
-    const voteCounts = new Map<string, number>();
-    for (const vote of votes) {
-      const count = voteCounts.get(vote.imageId) || 0;
-      voteCounts.set(vote.imageId, count + 1);
+
+    // Use extracted pure functions for vote counting and winner finding
+    const voteCounts = countVotesPerImage(votes);
+    const winningImageIds = findWinningImages(voteCounts);
+
+    if (winningImageIds.length === 0) {
+      console.log(`[calculateScores] No votes cast for round ${args.roundId}`);
+      return null;
     }
-    
-    // Find winning image(s)
-    const maxVotes = Math.max(...voteCounts.values(), 0);
-    if (maxVotes === 0) return null; // No votes cast
-    
-    const winningImages = Array.from(voteCounts.entries())
-      .filter(([_, count]) => count === maxVotes)
-      .map(([imageId]) => imageId);
-    
-    // Award points to winners
-    for (const imageId of winningImages) {
-      const image = await ctx.db.get(imageId as Id<"generatedImages">);
+
+    console.log(`[calculateScores] Found ${winningImageIds.length} winning image(s)`);
+
+    // Award points to winners (split if tie)
+    const pointsPerWinner = Math.floor(GAME_CONFIG.POINTS_PER_WIN / winningImageIds.length);
+    for (const imageId of winningImageIds) {
+      const image = await ctx.db.get(imageId);
       if (!image) continue;
-      
+
       const prompt = await ctx.db.get(image.promptId);
       if (!prompt) continue;
-      
+
       const player = await ctx.db.get(prompt.playerId);
       if (!player) continue;
-      
-      // Award points (split if tie)
-      const points = Math.floor(GAME_CONFIG.POINTS_PER_WIN / winningImages.length);
+
       await ctx.db.patch(player._id, {
-        score: player.score + points,
+        score: player.score + pointsPerWinner,
       });
+      console.log(`[calculateScores] Awarded ${pointsPerWinner} points to player ${player._id} (winner)`);
     }
-    
-    // Award participation points to voters
+
+    // Award participation points to voters (each voter gets points once)
+    const awardedVoterIds = new Set<Id<"players">>();
     for (const vote of votes) {
+      if (awardedVoterIds.has(vote.voterId)) continue;
+      awardedVoterIds.add(vote.voterId);
+
       const voter = await ctx.db.get(vote.voterId);
       if (voter) {
         await ctx.db.patch(vote.voterId, {
           score: voter.score + GAME_CONFIG.POINTS_PER_VOTE,
         });
+        console.log(`[calculateScores] Awarded ${GAME_CONFIG.POINTS_PER_VOTE} points to player ${vote.voterId} (participation)`);
       }
     }
-    
+
     return null;
   },
 });
@@ -1114,37 +1150,17 @@ export const checkAllPlayersVoted = internalMutation({
 
     console.log(`[checkAllPlayersVoted] Found ${submittedVotes.length} submitted votes`);
 
-    // Create a set of player IDs who have voted
-    const votedPlayerIds = new Set(submittedVotes.map(vote => vote.voterId));
+    // Use extracted pure functions for eligibility calculation
+    const eligibility = calculateVotingEligibility(connectedPlayers, prompts);
+    const eligibleVoters = eligibility.filter(e => e.isEligible).length;
+    const allEligibleVoted = haveAllEligiblePlayersVoted(eligibility, submittedVotes);
 
-    // Check voting eligibility for each connected player
-    let eligibleVoters = 0;
-    let playersWhoVoted = 0;
-
-    for (const player of connectedPlayers) {
-      // Check if this player submitted a prompt (and thus has an image they can't vote for)
-      const playerPrompt = prompts.find(p => p.playerId === player._id);
-
-      // Player is eligible to vote if:
-      // 1. There are images from other players to vote on
-      // 2. OR they didn't submit a prompt (so all images are votable)
-      const hasOtherPlayersImages = prompts.some(p => p.playerId !== player._id);
-
-      if (hasOtherPlayersImages || !playerPrompt) {
-        eligibleVoters++;
-        if (votedPlayerIds.has(player._id)) {
-          playersWhoVoted++;
-        }
-        console.log(`[checkAllPlayersVoted] Player ${player._id} is eligible, voted: ${votedPlayerIds.has(player._id)}`);
-      } else {
-        console.log(`[checkAllPlayersVoted] Player ${player._id} not eligible (only their own image available)`);
-      }
+    // Log eligibility for debugging
+    for (const e of eligibility) {
+      console.log(`[checkAllPlayersVoted] Player ${e.playerId} eligible: ${e.isEligible}, reason: ${e.reason}`);
     }
 
-    console.log(`[checkAllPlayersVoted] Eligible voters: ${eligibleVoters}, Players who voted: ${playersWhoVoted}`);
-
-    // Check if all eligible voters have voted
-    const allEligibleVoted = eligibleVoters > 0 && playersWhoVoted === eligibleVoters;
+    console.log(`[checkAllPlayersVoted] Eligible voters: ${eligibleVoters}, All voted: ${allEligibleVoted}`);
 
     if (allEligibleVoted) {
       console.log(`[checkAllPlayersVoted] All ${eligibleVoters} eligible players have voted! Triggering early transition`);
@@ -1171,6 +1187,8 @@ export const checkAllPlayersVoted = internalMutation({
 
       console.log(`[checkAllPlayersVoted] Early transition scheduled for round ${args.roundId}`);
     } else {
+      const votedPlayerIds = new Set(submittedVotes.map(v => v.voterId));
+      const playersWhoVoted = eligibility.filter(e => e.isEligible && votedPlayerIds.has(e.playerId)).length;
       console.log(`[checkAllPlayersVoted] Not all eligible players have voted yet (${playersWhoVoted}/${eligibleVoters})`);
     }
 
@@ -1236,15 +1254,23 @@ export const getGameState = query({
       : null;
     
     // Get current round
-    let round = null;
-    if (room.currentRound) {
+    let round: {
+      _id: Id<"rounds">;
+      status: string;
+      phaseEndTime: number | undefined;
+      question: string;
+      generationExpectedCount: number | undefined;
+      generationCompletedCount: number | undefined;
+    } | undefined = undefined;
+    const currentRoundNum = room.currentRound;
+    if (currentRoundNum) {
       const roundData = await ctx.db
         .query("rounds")
         .withIndex("by_room_and_number", (q) =>
-          q.eq("roomId", args.roomId).eq("roundNumber", room.currentRound)
+          q.eq("roomId", args.roomId).eq("roundNumber", currentRoundNum)
         )
         .unique();
-        
+
       if (roundData) {
         const card = await ctx.db.get(roundData.questionCardId);
         round = {

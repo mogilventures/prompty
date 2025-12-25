@@ -40,7 +40,7 @@ export const generateAIImages = internalAction({
     }
     
     // Log each prompt
-    prompts.forEach((prompt, index) => {
+    prompts.forEach((prompt: { text: string; playerId: string }, index: number) => {
       console.log(`[generateAIImages] Prompt ${index + 1}: "${prompt.text}" (Player: ${prompt.playerId})`);
     });
     
@@ -89,6 +89,13 @@ export const generateAIImages = internalAction({
 });
 
 // Test image generation with a specific model
+type TestImageResult = {
+  success: boolean;
+  imageUrl?: string;
+  error?: string;
+  model: string;
+};
+
 export const testImageGeneration = internalAction({
   args: {
     prompt: v.string(),
@@ -104,15 +111,15 @@ export const testImageGeneration = internalAction({
     error: v.optional(v.string()),
     model: v.string(),
   }),
-  handler: async (ctx, { prompt, model = "google/gemini-3-pro-image-preview" }) => {
+  handler: async (ctx, { prompt, model = "google/gemini-3-pro-image-preview" }): Promise<TestImageResult> => {
     console.log(`[testImageGeneration] Testing ${model} with prompt: ${prompt}`);
-    
+
     try {
-      const result = await ctx.runAction(internal.generate.generate.testGeneration, {
+      const result: { success: boolean; imageUrl?: string; error?: string } = await ctx.runAction(internal.generate.generate.testGeneration, {
         prompt,
         model,
       });
-      
+
       return {
         success: result.success,
         imageUrl: result.imageUrl,
@@ -131,6 +138,16 @@ export const testImageGeneration = internalAction({
 });
 
 // Get the status of available AI models
+type ModelStatusResult = {
+  models: Array<{
+    id: string;
+    name: string;
+    available: boolean;
+    error?: string;
+  }>;
+  defaultModel: string;
+};
+
 export const getAIModelStatus = internalAction({
   args: {},
   returns: v.object({
@@ -142,9 +159,10 @@ export const getAIModelStatus = internalAction({
     })),
     defaultModel: v.string(),
   }),
-  handler: async (ctx) => {
+  handler: async (ctx): Promise<ModelStatusResult> => {
     try {
-      return await ctx.runAction(internal.generate.generate.getGenerationStatus, {});
+      const status: ModelStatusResult = await ctx.runAction(internal.generate.generate.getGenerationStatus, {});
+      return status;
     } catch (error) {
       console.error(`[getAIModelStatus] Error checking model status:`, error);
       return {

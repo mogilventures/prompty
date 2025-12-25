@@ -45,7 +45,7 @@ export const generateDecoratedImages = internalAction({
       console.log(`[generateDecoratedImages] Processing ${prompts.length} prompts`);
 
       // Prepare prompts for generation
-      const promptsToGenerate = prompts.map(p => ({
+      const promptsToGenerate = prompts.map((p: { _id: Id<"prompts">; text: string }) => ({
         id: p._id,
         text: sanitizePrompt(p.text),
       }));

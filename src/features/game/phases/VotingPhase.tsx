@@ -121,7 +121,7 @@ const VotingPhase: React.FC<VotingPhaseProps> = ({
 
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="voting-phase">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1">
@@ -130,7 +130,7 @@ const VotingPhase: React.FC<VotingPhaseProps> = ({
           </h2>
           <p className="text-sm text-muted-foreground">
             {hasVoted ? (
-              <span className="flex items-center gap-2">
+              <span className="flex items-center gap-2" data-testid="vote-submitted-indicator">
                 <CheckCircle className="w-4 h-4 text-success" />
                 Vote submitted! Waiting for results...
               </span>
@@ -198,6 +198,7 @@ const VotingPhase: React.FC<VotingPhaseProps> = ({
             return (
               <motion.div
                 key={image._id}
+                data-testid={`image-card-${index}`}
                 className="relative group"
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -240,7 +241,10 @@ const VotingPhase: React.FC<VotingPhaseProps> = ({
 
                   {/* Own Image Indicator */}
                   {image.isOwn && (
-                    <div className="absolute bottom-2 left-2 bg-muted text-muted-foreground px-2 py-1 text-xs rounded-none">
+                    <div
+                      data-testid="own-image-indicator"
+                      className="absolute bottom-2 left-2 bg-muted text-muted-foreground px-2 py-1 text-xs rounded-none"
+                    >
                       Your Image
                     </div>
                   )}
@@ -386,12 +390,14 @@ const VotingPhase: React.FC<VotingPhaseProps> = ({
                     <Button
                       variant="outline"
                       onClick={handleCancelVote}
+                      data-testid="vote-cancel-button"
                       className="flex-1"
                     >
                       Cancel
                     </Button>
                     <Button
                       onClick={handleConfirmVote}
+                      data-testid="vote-confirm-button"
                       className="flex-1"
                     >
                       Vote

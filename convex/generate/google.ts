@@ -129,20 +129,20 @@ export async function generateWithGoogle(
     } catch (err) {
       throw new Error(`Failed to resize/convert Gemini output to webp: ${err}`);
     }
-    const webpBlob = new Blob([webpBuffer], { type: "image/webp" });
+    const webpBlob = new Blob([new Uint8Array(webpBuffer)], { type: "image/webp" });
     const storageId = await ctx.storage.store(webpBlob);
     const url = await ctx.storage.getUrl(storageId);
     if (!url) throw new Error("Failed to get storage URL after Gemini upload");
 
     console.log(`[generateWithGoogle] Successfully generated and stored image: ${url}`);
     return { url, storageId };
-    
+
   } catch (error) {
     console.error(`[generateWithGoogle] Error generating image:`, error);
-    
+
     // If Gemini fails, fall back to just storing the base image
     console.log(`[generateWithGoogle] Falling back to base image due to error`);
-    
+
     const baseImageBuffer = await createBaseImageFromPrompt(`${questionText} ${prompt}`, 512, 512);
     let webpBuffer: Buffer;
     try {
@@ -150,8 +150,8 @@ export async function generateWithGoogle(
     } catch (err) {
       throw new Error(`Failed to process fallback image: ${err}`);
     }
-    
-    const webpBlob = new Blob([webpBuffer], { type: "image/webp" });
+
+    const webpBlob = new Blob([new Uint8Array(webpBuffer)], { type: "image/webp" });
     const storageId = await ctx.storage.store(webpBlob);
     const url = await ctx.storage.getUrl(storageId);
     if (!url) throw new Error("Failed to get storage URL for fallback image");

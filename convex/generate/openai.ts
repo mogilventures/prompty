@@ -1,8 +1,7 @@
 "use node";
 import { Id } from "../_generated/dataModel";
 import { type ActionCtx } from "../_generated/server";
-import OpenAI from "openai";
-import { File } from "formdata-node";
+import OpenAI, { toFile } from "openai";
 import { resizeAndConvertToWebp, base64ToUint8Array, createBaseImageFromPrompt, createEnhancedPrompt } from "./lib";
 
 /**
@@ -36,9 +35,9 @@ export async function generateWithOpenAI(
       
       // Create base image
       const baseImageBuffer = await createBaseImageFromPrompt(`${questionText} ${prompt}`, 512, 512);
-      
-      // Convert to File object for OpenAI
-      const file = new File([baseImageBuffer], "base_image.png", {
+
+      // Convert to File object for OpenAI using their toFile helper
+      const file = await toFile(baseImageBuffer, "base_image.png", {
         type: "image/png",
       });
 
@@ -103,7 +102,7 @@ export async function generateWithOpenAI(
       throw new Error(`Failed to resize/convert image to webp: ${err}`);
     }
     
-    const webpBlob = new Blob([webpBuffer], { type: "image/webp" });
+    const webpBlob = new Blob([new Uint8Array(webpBuffer)], { type: "image/webp" });
     const storageId = await ctx.storage.store(webpBlob);
     const url = await ctx.storage.getUrl(storageId);
     if (!url) throw new Error("Failed to get storage URL after upload");

@@ -161,6 +161,7 @@ const Dashboard = () => {
                   onClick={handleCreateRoomClick}
                   className="flex h-full w-full flex-col items-start p-6 text-left"
                   aria-label="Create a new room"
+                  data-testid="create-room-button"
                 >
                   <div className="mb-3 inline-flex h-10 w-10 items-center justify-center border-2">
                     <Plus />
@@ -175,6 +176,7 @@ const Dashboard = () => {
                   onClick={() => setShowJoin(true)}
                   className="flex h-full w-full flex-col items-start p-6 text-left"
                   aria-label="Join a room"
+                  data-testid="join-room-button"
                 >
                   <div className="mb-3 inline-flex h-10 w-10 items-center justify-center border-2">
                     <DoorOpen />

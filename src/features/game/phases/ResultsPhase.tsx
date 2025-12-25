@@ -186,7 +186,7 @@ const ResultsPhase: React.FC<ResultsPhaseProps> = ({
   const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
 
   return (
-    <div className="space-y-8 relative">
+    <div className="space-y-8 relative" data-testid="results-phase">
       {/* Confetti */}
       <AnimatePresence>
         {showConfetti && <Confetti />}
@@ -254,8 +254,9 @@ const ResultsPhase: React.FC<ResultsPhaseProps> = ({
                   <GlowEffect isGlowing={true}>
                     <GentlePulse>
                       <motion.div
+                        data-testid="winner-image"
                         className="relative aspect-square w-64 h-64 border-4 border-primary rounded-none overflow-hidden"
-                        animate={{ 
+                        animate={{
                           boxShadow: [
                             "0 0 20px rgba(255, 215, 0, 0.5)",
                             "0 0 40px rgba(255, 215, 0, 0.8)",
@@ -301,7 +302,10 @@ const ResultsPhase: React.FC<ResultsPhaseProps> = ({
               <div className="flex-1 space-y-4 text-center lg:text-left">
                 <div>
                   <h3 className="text-xl font-display mb-2">Winning Prompt:</h3>
-                  <p className="text-lg italic bg-muted/50 p-4 rounded-none border-l-4 border-primary">
+                  <p
+                    data-testid="winner-prompt"
+                    className="text-lg italic bg-muted/50 p-4 rounded-none border-l-4 border-primary"
+                  >
                     "{primaryWinner.promptText}"
                   </p>
                 </div>
@@ -394,7 +398,7 @@ const ResultsPhase: React.FC<ResultsPhaseProps> = ({
         transition={{ delay: 1.2 }}
       >
         <CardShadow>
-          <Card className="p-6">
+          <Card className="p-6" data-testid="scoreboard">
             <h3 className="text-lg font-display mb-4 text-center">Updated Scoreboard</h3>
             <div className="space-y-2">
               {sortedPlayers.map((player, index) => {

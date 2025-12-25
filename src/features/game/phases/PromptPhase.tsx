@@ -220,6 +220,7 @@ const PromptPhase: React.FC<PromptPhaseProps> = ({
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
+            data-testid="prompt-submitted-indicator"
             className="flex items-center gap-2 p-3 bg-success/20 border-2 border-success rounded-none"
           >
             <CheckCircle className="w-4 h-4 text-success" />
@@ -240,6 +241,7 @@ const PromptPhase: React.FC<PromptPhaseProps> = ({
             <div className="relative">
               <Input
                 id="prompt-input"
+                data-testid="prompt-input"
                 maxLength={200}
                 value={prompt}
                 onChange={(e) => handlePromptChange(e.target.value)}
@@ -290,6 +292,7 @@ const PromptPhase: React.FC<PromptPhaseProps> = ({
             <Button
               onClick={handleSubmit}
               disabled={!prompt.trim() || hasProfanity || !!validationError}
+              data-testid="submit-prompt-button"
               className="flex items-center gap-2"
             >
               Submit
