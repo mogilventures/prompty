@@ -5,8 +5,8 @@ import { GoogleGenAI } from "@google/genai";
 import { resizeAndConvertToWebp, createBaseImageFromPrompt } from "./lib";
 
 /**
- * Generate decorated image using Google's Gemini 2.5 Flash model
- * 
+ * Generate decorated image using Google's Gemini 2.5 Flash Image model
+ *
  * NOTE: This function creates a base image from the prompt and then enhances it with Gemini
  */
 export async function generateWithGoogle(
@@ -15,7 +15,7 @@ export async function generateWithGoogle(
   questionText: string
 ): Promise<{ url: string; storageId: Id<"_storage"> }> {
   console.log(
-    `[generateWithGoogle] Using Gemini 2.5 Flash Image Preview with prompt: ${prompt}`
+    `[generateWithGoogle] Using Gemini 2.5 Flash Image with prompt: ${prompt}`
   );
 
   const apiKey =
@@ -52,7 +52,7 @@ export async function generateWithGoogle(
     ];
 
     const genResponse = await ai.models.generateContent({
-      model: "gemini-2.5-flash-image-preview",
+      model: "gemini-2.5-flash-image",
       contents,
     });
 
@@ -188,7 +188,7 @@ export async function generateImagesWithGoogleRateLimit(
           url: result.url,
           storageId: result.storageId,
           metadata: {
-            model: "gemini-2.5-flash-image-preview",
+            model: "gemini-2.5-flash-image",
             timestamp: Date.now(),
           },
         });
