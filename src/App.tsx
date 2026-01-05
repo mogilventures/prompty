@@ -10,6 +10,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Loader2 } from "lucide-react";
 import { createLazyRoute } from "@/utils/lazy";
 import { Analytics } from "@vercel/analytics/react";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 // Lazy load page components for better bundle splitting
 const Index = createLazyRoute(() => import("./pages/Index"), "homepage");
@@ -111,20 +112,22 @@ function AppRoutes() {
 }
 
 const App = () => (
-  <ThemeProvider>
-    <HelmetProvider>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <AppRoutes />
-          </BrowserRouter>
-          <Analytics />
-        </TooltipProvider>
-      </QueryClientProvider>
-    </HelmetProvider>
-  </ThemeProvider>
+  <ErrorBoundary>
+    <ThemeProvider>
+      <HelmetProvider>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <AppRoutes />
+            </BrowserRouter>
+            <Analytics />
+          </TooltipProvider>
+        </QueryClientProvider>
+      </HelmetProvider>
+    </ThemeProvider>
+  </ErrorBoundary>
 );
 
 export default App;
