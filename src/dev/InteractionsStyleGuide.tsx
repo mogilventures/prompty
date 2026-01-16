@@ -22,7 +22,7 @@ import {
   ShakeAttention,
   GlowEffect,
   FadeVariations
-} from "./MicroInteractions";
+} from "@/components/interactions/MicroInteractions";
 
 const InteractionsStyleGuide: React.FC = () => {
   const [progress, setProgress] = useState(0);

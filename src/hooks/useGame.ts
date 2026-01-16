@@ -3,7 +3,7 @@ import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "./use-toast";
+import { toast } from "./useToast";
 
 export function useGame(roomId: string | undefined) {
   const navigate = useNavigate();

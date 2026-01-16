@@ -15,9 +15,9 @@ import {
 } from "@/components/ui/dialog";
 import { Link, useNavigate } from "react-router-dom";
 import { DoorOpen, Grid3X3, LogOut, Plus } from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/useAuth";
 import { useAuthActions } from "@convex-dev/auth/react";
-import { useCreateRoom, useJoinRoom } from "@/hooks/use-room";
+import { useCreateRoom, useJoinRoom } from "@/hooks/useRoom";
 import { toast } from "sonner";
 
 const mockStats = {

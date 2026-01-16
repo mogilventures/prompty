@@ -24,7 +24,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { ImageItem, GridSettings, FilterOptions, SortOption } from "@/types/imageGrid";
 import ImageGridControls from "./ImageGridControls";
 import ImageGridItem from "./ImageGridItem";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/useMobileDetection";
 import { cn } from "@/lib/utils";
 
 interface ResponsiveImageGridProps {

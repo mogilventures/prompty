@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarShortcut, MenubarTrigger, MenubarLabel, MenubarRadioGroup, MenubarRadioItem } from "@/components/ui/8bit/menubar";
 import { useTheme } from "next-themes";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/useAuth";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { Moon, Sun, Monitor, LogOut, User } from "lucide-react";
 

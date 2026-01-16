@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/8bit/input";
 import { Label } from "@/components/ui/8bit/label";
 import { useAuthActions } from "@convex-dev/auth/react";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/useAuth";
 import { ArrowLeft, Mail, KeyRound, User, LogOut } from "lucide-react";
 
 const Login = () => {

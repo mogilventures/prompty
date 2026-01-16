@@ -17,7 +17,7 @@ describe("Game Flow Integration Tests", () => {
     it("creates a room with the specified number of players", async () => {
       const t = convexTest(schema);
 
-      const result = await t.mutation(internal.testing.createTestRoom, {
+      const result = await t.mutation(internal.__tests__.fixtures.createTestRoom, {
         playerCount: 3,
       });
 
@@ -26,7 +26,7 @@ describe("Game Flow Integration Tests", () => {
       expect(result.roomCode).toHaveLength(6);
 
       // Verify room state
-      const state = await t.query(internal.testing.getTestRoomState, {
+      const state = await t.query(internal.__tests__.fixtures.getTestRoomState, {
         roomId: result.roomId,
       });
 
@@ -37,7 +37,7 @@ describe("Game Flow Integration Tests", () => {
     it("enforces minimum 2 players", async () => {
       const t = convexTest(schema);
 
-      const result = await t.mutation(internal.testing.createTestRoom, {
+      const result = await t.mutation(internal.__tests__.fixtures.createTestRoom, {
         playerCount: 1, // Will be clamped to 2
       });
 
@@ -47,7 +47,7 @@ describe("Game Flow Integration Tests", () => {
     it("enforces maximum 12 players", async () => {
       const t = convexTest(schema);
 
-      const result = await t.mutation(internal.testing.createTestRoom, {
+      const result = await t.mutation(internal.__tests__.fixtures.createTestRoom, {
         playerCount: 20, // Will be clamped to 12
       });
 
@@ -61,7 +61,7 @@ describe("Game Flow Integration Tests", () => {
 
       // Create test room
       const { roomId, playerIds } = await t.mutation(
-        internal.testing.createTestRoom,
+        internal.__tests__.fixtures.createTestRoom,
         { playerCount: 2 }
       );
 
@@ -90,7 +90,7 @@ describe("Game Flow Integration Tests", () => {
       });
 
       // Submit prompt
-      const promptId = await t.mutation(internal.testing.simulateSubmitPrompt, {
+      const promptId = await t.mutation(internal.__tests__.fixtures.simulateSubmitPrompt, {
         playerId: playerIds[0],
         roundId,
         text: "A cute cat wearing a hat",
@@ -99,7 +99,7 @@ describe("Game Flow Integration Tests", () => {
       expect(promptId).toBeDefined();
 
       // Verify prompt was created
-      const state = await t.query(internal.testing.getTestRoomState, {
+      const state = await t.query(internal.__tests__.fixtures.getTestRoomState, {
         roomId,
       });
       // Note: getTestRoomState won't see the round since room.currentRound isn't set
@@ -110,7 +110,7 @@ describe("Game Flow Integration Tests", () => {
       const t = convexTest(schema);
 
       const { roomId, playerIds } = await t.mutation(
-        internal.testing.createTestRoom,
+        internal.__tests__.fixtures.createTestRoom,
         { playerCount: 2 }
       );
 
@@ -133,14 +133,14 @@ describe("Game Flow Integration Tests", () => {
       });
 
       // Submit first prompt
-      const promptId1 = await t.mutation(internal.testing.simulateSubmitPrompt, {
+      const promptId1 = await t.mutation(internal.__tests__.fixtures.simulateSubmitPrompt, {
         playerId: playerIds[0],
         roundId,
         text: "First prompt",
       });
 
       // Submit updated prompt
-      const promptId2 = await t.mutation(internal.testing.simulateSubmitPrompt, {
+      const promptId2 = await t.mutation(internal.__tests__.fixtures.simulateSubmitPrompt, {
         playerId: playerIds[0],
         roundId,
         text: "Updated prompt",
@@ -160,7 +160,7 @@ describe("Game Flow Integration Tests", () => {
       const t = convexTest(schema);
 
       const { roomId, playerIds } = await t.mutation(
-        internal.testing.createTestRoom,
+        internal.__tests__.fixtures.createTestRoom,
         { playerCount: 3 }
       );
 
@@ -197,7 +197,7 @@ describe("Game Flow Integration Tests", () => {
 
       // Generate images
       const imageIds = await t.mutation(
-        internal.testing.simulateImageGeneration,
+        internal.__tests__.fixtures.simulateImageGeneration,
         { roundId }
       );
 
@@ -215,7 +215,7 @@ describe("Game Flow Integration Tests", () => {
       const t = convexTest(schema);
 
       const { roomId, playerIds } = await t.mutation(
-        internal.testing.createTestRoom,
+        internal.__tests__.fixtures.createTestRoom,
         { playerCount: 2 }
       );
 
@@ -257,7 +257,7 @@ describe("Game Flow Integration Tests", () => {
       });
 
       // Player 0 votes for Player 1's image
-      const voteId = await t.mutation(internal.testing.simulateSubmitVote, {
+      const voteId = await t.mutation(internal.__tests__.fixtures.simulateSubmitVote, {
         voterId: playerIds[0],
         imageId: imageIds[1],
         roundId,
@@ -275,7 +275,7 @@ describe("Game Flow Integration Tests", () => {
       const t = convexTest(schema);
 
       const { roomId, playerIds } = await t.mutation(
-        internal.testing.createTestRoom,
+        internal.__tests__.fixtures.createTestRoom,
         { playerCount: 3 }
       );
 
@@ -316,14 +316,14 @@ describe("Game Flow Integration Tests", () => {
       });
 
       // First vote
-      const voteId1 = await t.mutation(internal.testing.simulateSubmitVote, {
+      const voteId1 = await t.mutation(internal.__tests__.fixtures.simulateSubmitVote, {
         voterId: playerIds[0],
         imageId: imageIds[1],
         roundId,
       });
 
       // Change vote
-      const voteId2 = await t.mutation(internal.testing.simulateSubmitVote, {
+      const voteId2 = await t.mutation(internal.__tests__.fixtures.simulateSubmitVote, {
         voterId: playerIds[0],
         imageId: imageIds[2],
         roundId,
@@ -343,12 +343,12 @@ describe("Game Flow Integration Tests", () => {
       const t = convexTest(schema);
 
       const { roomId, playerIds, userIds } = await t.mutation(
-        internal.testing.createTestRoom,
+        internal.__tests__.fixtures.createTestRoom,
         { playerCount: 2 }
       );
 
       // Clean up
-      await t.mutation(internal.testing.cleanupTestRoom, { roomId });
+      await t.mutation(internal.__tests__.fixtures.cleanupTestRoom, { roomId });
 
       // Verify room is deleted
       const room = await t.run(async (ctx) => ctx.db.get(roomId));

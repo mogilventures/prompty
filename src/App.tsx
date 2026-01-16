@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { HelmetProvider } from "react-helmet-async";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/useAuth";
 import { Loader2 } from "lucide-react";
 import { createLazyRoute } from "@/utils/lazy";
 import { Analytics } from "@vercel/analytics/react";
@@ -20,10 +20,12 @@ const Login = createLazyRoute(() => import("./pages/Login"), "login");
 const Signup = createLazyRoute(() => import("./pages/Signup"), "signup");
 const GameClient = createLazyRoute(() => import("./pages/GameClient"), "game");
 const Dashboard = createLazyRoute(() => import("./pages/Dashboard"), "dashboard");
-const ImageGridDemo = createLazyRoute(() => import("./pages/ImageGridDemo"), "image grid demo");
-const InteractionsStyleGuide = createLazyRoute(() => import("./components/interactions/InteractionsStyleGuide"), "style guide");
 const TermsOfService = createLazyRoute(() => import("./pages/TermsOfService"), "terms of service");
-const TestLogin = createLazyRoute(() => import("./pages/TestLogin"), "test login");
+
+// Dev-only routes (only loaded in development)
+const ImageGridDemo = import.meta.env.DEV ? createLazyRoute(() => import("./dev/ImageGridDemo"), "image grid demo") : null;
+const InteractionsStyleGuide = import.meta.env.DEV ? createLazyRoute(() => import("./dev/InteractionsStyleGuide"), "style guide") : null;
+const TestLogin = import.meta.env.DEV ? createLazyRoute(() => import("./dev/TestLogin"), "test login") : null;
 
 const queryClient = new QueryClient();
 
@@ -54,15 +56,19 @@ function AppRoutes() {
         element={isAuthenticated ? <Navigate to="/app/dashboard" replace /> : <Signup />} 
       />
       
-      {/* Demo routes (public for now) */}
-      <Route path="/image-grid-demo" element={<ImageGridDemo />} />
-      <Route path="/interactions-guide" element={<InteractionsStyleGuide />} />
+      {/* Dev-only routes (only available in development) */}
+      {import.meta.env.DEV && ImageGridDemo && (
+        <Route path="/dev/image-grid-demo" element={<ImageGridDemo />} />
+      )}
+      {import.meta.env.DEV && InteractionsStyleGuide && (
+        <Route path="/dev/interactions-guide" element={<InteractionsStyleGuide />} />
+      )}
+      {import.meta.env.DEV && TestLogin && (
+        <Route path="/dev/test-login" element={<TestLogin />} />
+      )}
 
       {/* Legal pages */}
       <Route path="/terms" element={<TermsOfService />} />
-
-      {/* Test login route - for E2E testing only */}
-      <Route path="/test-login" element={<TestLogin />} />
       
       {/* Protected routes */}
       <Route 

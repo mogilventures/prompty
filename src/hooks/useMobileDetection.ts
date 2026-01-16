@@ -89,3 +89,12 @@ export const useMobileDetection = (): MobileDetectionResult => {
 
   return detection;
 };
+
+/**
+ * Simple hook that returns a boolean indicating if the device is mobile.
+ * Use this for basic responsive checks. For more detailed info, use useMobileDetection.
+ */
+export const useIsMobile = (): boolean => {
+  const { isMobile } = useMobileDetection();
+  return isMobile;
+};

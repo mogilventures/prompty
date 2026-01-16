@@ -69,7 +69,7 @@ http.route({
       }
 
       // Get room ID by code
-      const roomId = await ctx.runQuery(internal.e2eTesting.getRoomByCode, {
+      const roomId = await ctx.runQuery(internal.__tests__.e2e.getRoomByCode, {
         code: roomCode.toUpperCase(),
       });
 
@@ -82,7 +82,7 @@ http.route({
 
       // Mock the images
       const result = await ctx.runMutation(
-        internal.e2eTesting.mockImageGenerationForE2E,
+        internal.__tests__.e2e.mockImageGenerationForE2E,
         { roomId }
       );
 
@@ -124,7 +124,7 @@ http.route({
       }
 
       // Get room ID by code
-      const roomId = await ctx.runQuery(internal.e2eTesting.getRoomByCode, {
+      const roomId = await ctx.runQuery(internal.__tests__.e2e.getRoomByCode, {
         code: code.toUpperCase(),
       });
 
@@ -136,7 +136,7 @@ http.route({
       }
 
       // Get room state
-      const state = await ctx.runQuery(internal.testing.getTestRoomState, {
+      const state = await ctx.runQuery(internal.__tests__.fixtures.getTestRoomState, {
         roomId,
       });
 
@@ -178,7 +178,7 @@ http.route({
       }
 
       // Get room ID by code
-      const roomId = await ctx.runQuery(internal.e2eTesting.getRoomByCode, {
+      const roomId = await ctx.runQuery(internal.__tests__.e2e.getRoomByCode, {
         code: roomCode.toUpperCase(),
       });
 
@@ -190,7 +190,7 @@ http.route({
       }
 
       // Get current round
-      const state = await ctx.runQuery(internal.testing.getTestRoomState, {
+      const state = await ctx.runQuery(internal.__tests__.fixtures.getTestRoomState, {
         roomId,
       });
 
@@ -202,7 +202,7 @@ http.route({
       }
 
       // Force transition
-      await ctx.runMutation(internal.testing.forcePhaseTransition, {
+      await ctx.runMutation(internal.__tests__.fixtures.forcePhaseTransition, {
         roundId: state.currentRound._id,
       });
 

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/8bit/button";
 import { OnboardingStepProps } from "../OnboardingWizard";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/useAuth";
 
 export function WelcomeStep({ onNext, isFirst }: OnboardingStepProps) {
   const { user } = useAuth();

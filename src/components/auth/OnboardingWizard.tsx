@@ -6,7 +6,7 @@ import { UsernameStep } from "./steps/UsernameStep";
 import { DisplayNameStep } from "./steps/DisplayNameStep";
 import { AvatarStep } from "./steps/AvatarStep";
 import { CompletionStep } from "./steps/CompletionStep";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/useAuth";
 
 // Avatar data interface
 interface AvatarData {

@@ -4,10 +4,10 @@ import { Button } from "@/components/ui/8bit/button";
 import { LogIn, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuthActions } from "@convex-dev/auth/react";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/useAuth";
 import { useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/useToast";
 import UsernameDialog from "@/components/auth/UsernameDialog";
 
 // Constants
@@ -25,7 +25,7 @@ export const JoinRoomForm = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const updateUsername = useMutation(api.users.updateUsername);
-  const joinRoom = useMutation(api.rooms.joinRoom);
+  const joinRoom = useMutation(api.rooms.join.joinRoom);
   const [isSigningIn, setIsSigningIn] = useState(false);
 
   const navigateToRoom = useCallback((roomId: string) => {

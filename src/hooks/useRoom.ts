@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
-import { useAuth } from "./use-auth";
+import { useAuth } from "./useAuth";
 import { useNavigate } from "react-router-dom";
 import { useCallback, useEffect } from "react";
 
@@ -10,13 +10,13 @@ export function useRoom(roomId: string | undefined) {
   const navigate = useNavigate();
   
   const roomState = useQuery(
-    api.rooms.getRoomState,
+    api.rooms.state.getRoomState,
     roomId ? { roomId: roomId as Id<"rooms"> } : "skip"
   );
-  
-  const leaveRoom = useMutation(api.rooms.leaveRoom);
-  const kickPlayer = useMutation(api.rooms.kickPlayer);
-  const updateSettings = useMutation(api.rooms.updateRoomSettings);
+
+  const leaveRoom = useMutation(api.rooms.players.leaveRoom);
+  const kickPlayer = useMutation(api.rooms.players.kickPlayer);
+  const updateSettings = useMutation(api.rooms.settings.updateRoomSettings);
   const startGame = useMutation(api.game.startGame);
   
   const handleLeaveRoom = useCallback(async () => {
@@ -100,7 +100,7 @@ export function useRoom(roomId: string | undefined) {
 }
 
 export function useJoinRoom() {
-  const joinRoom = useMutation(api.rooms.joinRoom);
+  const joinRoom = useMutation(api.rooms.join.joinRoom);
   const navigate = useNavigate();
   
   const handleJoinRoom = useCallback(async (code: string) => {
@@ -124,7 +124,7 @@ export function useJoinRoom() {
 }
 
 export function useCreateRoom() {
-  const createRoom = useMutation(api.rooms.createRoom);
+  const createRoom = useMutation(api.rooms.create.createRoom);
   const navigate = useNavigate();
   
   const handleCreateRoom = useCallback(async (

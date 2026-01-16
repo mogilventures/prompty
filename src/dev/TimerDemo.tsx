@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Timer, { TimerDisplayMode } from "./Timer";
+import Timer, { TimerDisplayMode } from "@/components/game/Timer";
 import { useTimer } from "@/hooks/useTimer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";

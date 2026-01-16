@@ -1,4 +1,4 @@
-import { RetroCard as Card, RetroCardContent as CardContent } from "@/components/retro/RetroCard";
+import { Card, CardContent } from "@/components/ui/8bit/card";
 import { Users, Sparkles, Trophy } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/8bit/button";
 import { Play, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuthActions } from "@convex-dev/auth/react";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/useAuth";
 import { useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import UsernameDialog from "@/components/auth/UsernameDialog";
@@ -14,7 +14,7 @@ export const CreateRoomButton = () => {
   const { signIn } = useAuthActions();
   const navigate = useNavigate();
   const updateUsername = useMutation(api.users.updateUsername);
-  const createRoom = useMutation(api.rooms.createRoom);
+  const createRoom = useMutation(api.rooms.create.createRoom);
   const [showNameModal, setShowNameModal] = useState(false);
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [isCreatingRoom, setIsCreatingRoom] = useState(false);

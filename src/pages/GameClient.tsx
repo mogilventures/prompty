@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/8bit/button";
 import { Card } from "@/components/ui/8bit/card";
 import { LoadingSpinner } from "@/components/ui/loading";
 import { DynamicIcon } from "@/components/ui/dynamic-icon";
-import { useGame } from "@/hooks/use-game";
+import { useGame } from "@/hooks/useGame";
 
 // Import optimized game phase loader
 import {
