@@ -168,9 +168,9 @@ const Login = () => {
                     </div>
                     
                     {error && (
-                      <p className="text-sm text-red-500">{error}</p>
+                      <p className="text-sm text-destructive">{error}</p>
                     )}
-                    
+
                     <Button type="submit" className="w-full" disabled={loading}>
                       {loading ? "Sending..." : "Send Code"}
                     </Button>
@@ -194,9 +194,9 @@ const Login = () => {
                     </div>
                     
                     {error && (
-                      <p className="text-sm text-red-500">{error}</p>
+                      <p className="text-sm text-destructive">{error}</p>
                     )}
-                    
+
                     <Button type="submit" className="w-full" disabled={loading || code.length !== 6}>
                       {loading ? "Verifying..." : "Sign In"}
                     </Button>

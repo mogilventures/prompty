@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/8bit/input";
 import { Button } from "@/components/ui/8bit/button";
 import { LogIn, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -164,15 +164,15 @@ export const JoinRoomForm = () => {
               setCode(next);
               if (error) setError(null); // Clear error when user starts typing
             }}
-            className={`flex-1 min-w-0 px-2 sm:px-3 h-12 text-center tracking-[0.1em] uppercase md:h-12 [&::placeholder]:whitespace-nowrap [&::placeholder]:tracking-tighter [&::placeholder]:normal-case [&::placeholder]:text-[9px] sm:[&::placeholder]:text-xs md:[&::placeholder]:text-sm ${
+            className={`flex-1 min-w-0 px-3 h-11 text-center tracking-[0.1em] uppercase ${
               shouldShowError ? "border-destructive focus:border-destructive" : ""
             }`}
             disabled={isFormDisabled}
           />
-          <Button 
-            type="submit" 
-            variant="outline" 
-            size="xl" 
+          <Button
+            type="submit"
+            variant="outline"
+            size="lg"
             aria-label="Join room with code"
             disabled={isFormDisabled || code.length !== ROOM_CODE_LENGTH}
           >
@@ -202,7 +202,7 @@ export const JoinRoomForm = () => {
         )}
         
         {/* Help text */}
-        <div className="text-xs text-muted-foreground text-center px-2">
+        <div className="text-sm text-muted-foreground text-center px-2">
           Enter a {ROOM_CODE_LENGTH}-character room code to join an existing game
         </div>
       </form>

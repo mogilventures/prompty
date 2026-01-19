@@ -178,7 +178,7 @@ const GeneratingPhase: React.FC<GeneratingPhaseProps> = ({
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
-              className="text-lg font-semibold text-green-500 flex items-center justify-center gap-2"
+              className="text-lg font-semibold text-success flex items-center justify-center gap-2"
             >
               <Zap className="w-5 h-5" />
               All images ready! Get ready to vote!

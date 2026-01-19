@@ -433,7 +433,7 @@ const ResultsPhase: React.FC<ResultsPhaseProps> = ({
                             initial={{ opacity: 0, scale: 0.5, y: 10 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0 }}
-                            className="flex items-center gap-1 text-green-500 text-sm font-medium"
+                            className="flex items-center gap-1 text-success text-sm font-medium"
                           >
                             <ArrowUp className="w-3 h-3" />
                             +{scoreChange.value}
@@ -444,7 +444,7 @@ const ResultsPhase: React.FC<ResultsPhaseProps> = ({
                             initial={{ opacity: 0, scale: 0.5, y: 10 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0 }}
-                            className="flex items-center gap-1 text-red-500 text-sm font-medium"
+                            className="flex items-center gap-1 text-destructive text-sm font-medium"
                           >
                             <ArrowDown className="w-3 h-3" />
                             -{scoreChange.value}

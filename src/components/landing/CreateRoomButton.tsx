@@ -97,7 +97,7 @@ export const CreateRoomButton = () => {
   return (
     <>
       <Button
-        size="xl"
+        size="lg"
         onClick={handleCreateRoom}
         aria-label="Create Room"
         className="w-full hover-scale motion-reduce:transform-none"

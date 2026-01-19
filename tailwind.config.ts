@@ -58,6 +58,14 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				success: {
+					DEFAULT: 'hsl(var(--success))',
+					foreground: 'hsl(var(--success-foreground))'
+				},
+				warning: {
+					DEFAULT: 'hsl(var(--warning))',
+					foreground: 'hsl(var(--warning-foreground))'
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
@@ -129,6 +137,10 @@ export default {
 					'0%': { transform: 'rotate(0deg) scale(1)' },
 					'50%': { transform: 'rotate(180deg) scale(1.1)' },
 					'100%': { transform: 'rotate(360deg) scale(1)' }
+				},
+				'fade-in': {
+					'0%': { opacity: '0', transform: 'translateY(10px)' },
+					'100%': { opacity: '1', transform: 'translateY(0)' }
 				}
 			},
 			animation: {
@@ -144,7 +156,8 @@ export default {
 				'ripple': 'ripple 0.6s ease-out',
 				'draw-checkmark': 'draw-checkmark 0.6s ease-in-out',
 				'secret-rainbow': 'secret-rainbow 2s linear infinite',
-				'easter-spin': 'easter-spin 1s ease-in-out'
+				'easter-spin': 'easter-spin 1s ease-in-out',
+				'fade-in': 'fade-in 0.5s ease-out forwards'
 			}
 		}
 	},

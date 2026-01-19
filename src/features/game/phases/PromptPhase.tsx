@@ -246,7 +246,7 @@ const PromptPhase: React.FC<PromptPhaseProps> = ({
                 value={prompt}
                 onChange={(e) => handlePromptChange(e.target.value)}
                 placeholder={EXAMPLE_PROMPTS[placeholderIndex]}
-                className={`w-full pr-16 ${validationError ? 'border-red-500' : ''}`}
+                className={`w-full pr-16 ${validationError ? 'border-destructive' : ''}`}
                 disabled={hasSubmitted}
               />
               <div className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -257,7 +257,7 @@ const PromptPhase: React.FC<PromptPhaseProps> = ({
             </div>
             
             {validationError && (
-              <p className="text-red-500 text-sm mt-1">{validationError}</p>
+              <p className="text-destructive text-sm mt-1">{validationError}</p>
             )}
           </div>
 
@@ -349,7 +349,7 @@ const PromptPhase: React.FC<PromptPhaseProps> = ({
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
-            className="fixed inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm z-50"
+            className="fixed inset-0 flex items-center justify-center bg-background/90 backdrop-blur-sm z-50"
           >
             <Card className="p-6 text-center space-y-4 max-w-sm">
               <CheckCircle className="w-12 h-12 text-success mx-auto" />

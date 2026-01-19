@@ -286,7 +286,7 @@ const Room = () => {
                         </Avatar>
                         <span
                           className={`absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-background ${
-                            player.status === "connected" ? "bg-green-500" : "bg-muted-foreground"
+                            player.status === "connected" ? "bg-success" : "bg-muted-foreground"
                           }`}
                           aria-label={player.status === "connected" ? "connected" : "disconnected"}
                         />
