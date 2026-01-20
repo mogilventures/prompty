@@ -120,18 +120,20 @@ function AppRoutes() {
 const App = () => (
   <ErrorBoundary>
     <ThemeProvider>
-      <HelmetProvider>
-        <QueryClientProvider client={queryClient}>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <AppRoutes />
-            </BrowserRouter>
-            <Analytics />
-          </TooltipProvider>
-        </QueryClientProvider>
-      </HelmetProvider>
+      <div className="dark:crt-scanlines dark:crt-vignette">
+        <HelmetProvider>
+          <QueryClientProvider client={queryClient}>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <AppRoutes />
+              </BrowserRouter>
+              <Analytics />
+            </TooltipProvider>
+          </QueryClientProvider>
+        </HelmetProvider>
+      </div>
     </ThemeProvider>
   </ErrorBoundary>
 );

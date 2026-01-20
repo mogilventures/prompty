@@ -30,10 +30,12 @@ export const HeroSection = () => {
           className="mx-auto mt-8 flex w-full max-w-3xl flex-col items-stretch gap-3 md:flex-row md:items-start animate-fade-in motion-reduce:animate-none"
           style={{ animationDelay: "200ms" }}
         >
-          <div className="flex-1 flex">
+          <div className="flex-1 flex items-center gap-2">
+            <span className="hidden dark:inline-block text-foreground crt-glow select-none">&gt;</span>
             <CreateRoomButton />
           </div>
-          <div className="flex-1 flex">
+          <div className="flex-1 flex items-center gap-2">
+            <span className="hidden dark:inline-block text-foreground crt-glow select-none">&gt;</span>
             <JoinRoomForm />
           </div>
         </div>

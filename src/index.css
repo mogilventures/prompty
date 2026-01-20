@@ -147,7 +147,54 @@ All colors MUST be HSL.
     --timer-safe: 120 60% 60%;
     --timer-warning: 45 100% 70%;
     --timer-danger: 0 100% 70%;
+    --crt-glow-color: 120 100% 50%;
+    --crt-scanline-opacity: 0.06;
   }
+}
+
+/* CRT Terminal Effects - Dark mode only */
+@layer utilities {
+  /* Scanlines - fixed overlay */
+  .crt-scanlines::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 2px,
+      hsl(0 0% 0% / var(--crt-scanline-opacity, 0)) 2px,
+      hsl(0 0% 0% / var(--crt-scanline-opacity, 0)) 4px
+    );
+  }
+
+  /* Vignette - darkened edges */
+  .crt-vignette::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9998;
+    background: radial-gradient(ellipse at center, transparent 50%, hsl(0 0% 0% / 0.3) 100%);
+  }
+
+  /* Phosphor text glow */
+  .crt-glow {
+    text-shadow: 0 0 2px hsl(var(--crt-glow-color) / 0.6),
+                 0 0 8px hsl(var(--crt-glow-color) / 0.3);
+  }
+
+  /* Blinking cursor for inputs */
+  .crt-cursor {
+    caret-color: hsl(var(--foreground));
+  }
+}
+
+/* Subtle phosphor glow on all dark mode text */
+.dark body {
+  text-shadow: 0 0 1px hsl(120 100% 50% / 0.2);
 }
 
 /* Micro-interaction utilities */

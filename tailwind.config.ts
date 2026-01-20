@@ -141,6 +141,10 @@ export default {
 				'fade-in': {
 					'0%': { opacity: '0', transform: 'translateY(10px)' },
 					'100%': { opacity: '1', transform: 'translateY(0)' }
+				},
+				'crt-blink': {
+					'0%, 50%': { opacity: '1' },
+					'51%, 100%': { opacity: '0' }
 				}
 			},
 			animation: {
@@ -157,7 +161,8 @@ export default {
 				'draw-checkmark': 'draw-checkmark 0.6s ease-in-out',
 				'secret-rainbow': 'secret-rainbow 2s linear infinite',
 				'easter-spin': 'easter-spin 1s ease-in-out',
-				'fade-in': 'fade-in 0.5s ease-out forwards'
+				'fade-in': 'fade-in 0.5s ease-out forwards',
+				'crt-blink': 'crt-blink 1s step-end infinite'
 			}
 		}
 	},
