@@ -7,7 +7,9 @@ import { Input } from "@/components/ui/8bit/input";
 import { Label } from "@/components/ui/8bit/label";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useAuth } from "@/hooks/useAuth";
-import { ArrowLeft, Mail, KeyRound, User, LogOut } from "lucide-react";
+import { ArrowLeft, Mail, KeyRound, User, LogOut, Gamepad2 } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
+import { PixelDecoration } from "@/components/landing/PixelDecoration";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -20,6 +22,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const reduceMotion = useReducedMotion();
 
   const canonical =
     typeof window !== "undefined"
@@ -50,7 +53,7 @@ const Login = () => {
     setIsSubmitting(true);
     setLoading(true);
     setError(null);
-    
+
     try {
       const formData = new FormData();
       formData.append("email", email);
@@ -68,16 +71,16 @@ const Login = () => {
     setIsSubmitting(true);
     setLoading(true);
     setError(null);
-    
+
     try {
       const formData = new FormData();
       formData.append("email", email);
       formData.append("code", code);
-      
+
       console.log("Attempting to verify code with email:", email, "and code:", code);
       await signIn("resend-otp", formData);
       console.log("Sign in successful, waiting for auth state to update...");
-      
+
       // The useEffect will handle navigation when isAuthenticated becomes true
     } catch (err) {
       console.error("Sign in error:", err);
@@ -93,6 +96,11 @@ const Login = () => {
     setError(null);
   };
 
+  const cardVariants = {
+    hidden: reduceMotion ? {} : { opacity: 0, y: 20, scale: 0.95 },
+    visible: reduceMotion ? {} : { opacity: 1, y: 0, scale: 1 },
+  };
+
   // Show sign out option if already authenticated
   if (isAuthenticated && !isSubmitting) {
     return (
@@ -105,24 +113,57 @@ const Login = () => {
           />
           <link rel="canonical" href={canonical} />
         </Helmet>
-        <main className="container mx-auto max-w-md px-4 py-16">
-          <Card>
-            <CardHeader>
-              <CardTitle>Already signed in</CardTitle>
-              <CardDescription>
-                You're already signed in as {user?.displayName || user?.username || "User"}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Button onClick={() => navigate("/app/dashboard")} className="w-full">
-                Go to Dashboard
-              </Button>
-              <Button variant="outline" onClick={async () => { await signOut(); setIsSubmitting(false); }} className="w-full">
-                <LogOut className="mr-2 h-4 w-4" />
-                Sign Out to Use Different Account
-              </Button>
-            </CardContent>
-          </Card>
+        <main className="relative min-h-screen bg-gradient-to-b from-hero-start to-hero-end overflow-hidden">
+          {/* Floating decorations */}
+          <PixelDecoration
+            shape="star"
+            size="md"
+            color="primary"
+            floatSpeed="slow"
+            className="absolute top-20 left-[15%] opacity-60"
+            delay={0.2}
+          />
+          <PixelDecoration
+            shape="diamond"
+            size="sm"
+            color="accent"
+            floatSpeed="medium"
+            className="absolute top-40 right-[20%] opacity-50"
+            delay={0.4}
+          />
+
+          <div className="container mx-auto max-w-md px-4 py-16">
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={cardVariants}
+              transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+            >
+              <Card className="relative">
+                {/* Corner pixel decorations */}
+                <div className="absolute top-0 left-0 w-1.5 h-1.5 bg-foreground/60 -translate-x-px -translate-y-px" aria-hidden="true" />
+                <div className="absolute top-0 right-0 w-1.5 h-1.5 bg-foreground/60 translate-x-px -translate-y-px" aria-hidden="true" />
+                <div className="absolute bottom-0 left-0 w-1.5 h-1.5 bg-foreground/60 -translate-x-px translate-y-px" aria-hidden="true" />
+                <div className="absolute bottom-0 right-0 w-1.5 h-1.5 bg-foreground/60 translate-x-px translate-y-px" aria-hidden="true" />
+
+                <CardHeader>
+                  <CardTitle>Already signed in</CardTitle>
+                  <CardDescription>
+                    You're already signed in as {user?.displayName || user?.username || "User"}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Button onClick={() => navigate("/app/dashboard")} className="w-full">
+                    Go to Dashboard
+                  </Button>
+                  <Button variant="outline" onClick={async () => { await signOut(); setIsSubmitting(false); }} className="w-full">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign Out to Use Different Account
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
         </main>
       </>
     );
@@ -138,107 +179,155 @@ const Login = () => {
         />
         <link rel="canonical" href={canonical} />
       </Helmet>
-      <main className="container mx-auto max-w-md px-4 py-16">
-        <section aria-labelledby="login-title">
-          <div className="flex flex-col gap-6 font-display">
-            <Card>
-              <CardHeader className="text-center">
-                <CardTitle className="text-xl">Sign in or create account</CardTitle>
-                <CardDescription className="text-xs">
-                  {step === "email" 
-                    ? "Enter your email to sign in or create a new account" 
-                    : `We sent a 6-digit code to ${email}`}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {step === "email" ? (
-                  <form onSubmit={handleSendCode} className="space-y-4">
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        type="email"
-                        placeholder="Enter your email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="pl-10"
-                        required
-                        disabled={loading}
-                        autoFocus
-                      />
-                    </div>
-                    
-                    {error && (
-                      <p className="text-sm text-destructive">{error}</p>
-                    )}
+      <main className="relative min-h-screen bg-gradient-to-b from-hero-start to-hero-end overflow-hidden">
+        {/* Floating decorations */}
+        <PixelDecoration
+          shape="star"
+          size="md"
+          color="primary"
+          floatSpeed="slow"
+          className="absolute top-20 left-[15%] opacity-60"
+          delay={0.2}
+        />
+        <PixelDecoration
+          shape="diamond"
+          size="sm"
+          color="accent"
+          floatSpeed="medium"
+          className="absolute top-40 right-[20%] opacity-50"
+          delay={0.4}
+        />
+        <PixelDecoration
+          shape="cross"
+          size="sm"
+          color="muted"
+          floatSpeed="slow"
+          className="absolute bottom-32 left-[10%] opacity-40"
+          delay={0.6}
+        />
 
-                    <Button type="submit" className="w-full" disabled={loading}>
-                      {loading ? "Sending..." : "Send Code"}
-                    </Button>
-                  </form>
-                ) : (
-                  <form onSubmit={handleVerifyCode} className="space-y-4">
-                    <div className="relative">
-                      <KeyRound className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        type="text"
-                        placeholder="6-digits"
-                        value={code}
-                        onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                        className="pl-10 text-center text-2xl tracking-widest placeholder:text-base placeholder:tracking-normal"
-                        maxLength={6}
-                        pattern="[0-9]{6}"
-                        required
-                        disabled={loading}
-                        autoFocus
-                      />
-                    </div>
-                    
-                    {error && (
-                      <p className="text-sm text-destructive">{error}</p>
-                    )}
+        <div className="container mx-auto max-w-md px-4 py-16">
+          <section aria-labelledby="login-title">
+            <motion.div
+              className="flex flex-col gap-6 font-display"
+              initial="hidden"
+              animate="visible"
+              variants={cardVariants}
+              transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+            >
+              <Card className="relative">
+                {/* Corner pixel decorations */}
+                <div className="absolute top-0 left-0 w-1.5 h-1.5 bg-foreground/60 -translate-x-px -translate-y-px" aria-hidden="true" />
+                <div className="absolute top-0 right-0 w-1.5 h-1.5 bg-foreground/60 translate-x-px -translate-y-px" aria-hidden="true" />
+                <div className="absolute bottom-0 left-0 w-1.5 h-1.5 bg-foreground/60 -translate-x-px translate-y-px" aria-hidden="true" />
+                <div className="absolute bottom-0 right-0 w-1.5 h-1.5 bg-foreground/60 translate-x-px translate-y-px" aria-hidden="true" />
 
-                    <Button type="submit" className="w-full" disabled={loading || code.length !== 6}>
-                      {loading ? "Verifying..." : "Sign In"}
-                    </Button>
-                    
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      className="w-full"
-                      onClick={handleBack}
-                      disabled={loading}
-                    >
-                      <ArrowLeft className="mr-2 h-4 w-4" />
-                      Use Different Email
-                    </Button>
-                    
-                    <p className="text-center text-sm text-muted-foreground">
-                      Didn't receive the code?{" "}
-                      <button
+                <CardHeader className="text-center">
+                  {/* App icon */}
+                  <div className="mx-auto mb-4 w-16 h-16 bg-gradient-to-br from-primary/20 to-primary/40 rounded-full flex items-center justify-center">
+                    <Gamepad2 className="w-8 h-8 text-primary" />
+                  </div>
+                  <CardTitle className="text-xl">Sign in or create account</CardTitle>
+                  <CardDescription className="text-xs">
+                    {step === "email"
+                      ? "Enter your email to sign in or create a new account"
+                      : `We sent a 6-digit code to ${email}`}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {step === "email" ? (
+                    <form onSubmit={handleSendCode} className="space-y-4">
+                      <div className="relative">
+                        <div className="absolute left-3 top-3 w-6 h-6 bg-primary/10 rounded flex items-center justify-center">
+                          <Mail className="h-3.5 w-3.5 text-primary" />
+                        </div>
+                        <Input
+                          type="email"
+                          placeholder="Enter your email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className="pl-12"
+                          required
+                          disabled={loading}
+                          autoFocus
+                        />
+                      </div>
+
+                      {error && (
+                        <p className="text-sm text-destructive">{error}</p>
+                      )}
+
+                      <Button type="submit" className="w-full" disabled={loading}>
+                        {loading ? "Sending..." : "Send Code"}
+                      </Button>
+                    </form>
+                  ) : (
+                    <form onSubmit={handleVerifyCode} className="space-y-4">
+                      <div className="relative">
+                        <div className="absolute left-3 top-3 w-6 h-6 bg-primary/10 rounded flex items-center justify-center">
+                          <KeyRound className="h-3.5 w-3.5 text-primary" />
+                        </div>
+                        <Input
+                          type="text"
+                          placeholder="6-digits"
+                          value={code}
+                          onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                          className="pl-12 text-center text-2xl tracking-widest placeholder:text-base placeholder:tracking-normal"
+                          maxLength={6}
+                          pattern="[0-9]{6}"
+                          required
+                          disabled={loading}
+                          autoFocus
+                        />
+                      </div>
+
+                      {error && (
+                        <p className="text-sm text-destructive">{error}</p>
+                      )}
+
+                      <Button type="submit" className="w-full" disabled={loading || code.length !== 6}>
+                        {loading ? "Verifying..." : "Sign In"}
+                      </Button>
+
+                      <Button
                         type="button"
-                        onClick={async () => {
-                          const syntheticEvent = {
-                            preventDefault: () => {},
-                            currentTarget: null,
-                          } as React.FormEvent;
-                          await handleSendCode(syntheticEvent);
-                        }}
-                        className="underline hover:text-primary"
+                        variant="ghost"
+                        className="w-full"
+                        onClick={handleBack}
                         disabled={loading}
                       >
-                        Resend
-                      </button>
-                    </p>
-                  </form>
-                )}
-              </CardContent>
-            </Card>
-            <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary">
-              By signing in, you agree to our <Link to="/terms">Terms of Service</Link> and <Link to="/terms">Privacy Policy</Link>.
-              New accounts will be created automatically.
-            </div>
-          </div>
-        </section>
+                        <ArrowLeft className="mr-2 h-4 w-4" />
+                        Use Different Email
+                      </Button>
+
+                      <p className="text-center text-sm text-muted-foreground">
+                        Didn't receive the code?{" "}
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            const syntheticEvent = {
+                              preventDefault: () => {},
+                              currentTarget: null,
+                            } as React.FormEvent;
+                            await handleSendCode(syntheticEvent);
+                          }}
+                          className="underline hover:text-primary"
+                          disabled={loading}
+                        >
+                          Resend
+                        </button>
+                      </p>
+                    </form>
+                  )}
+                </CardContent>
+              </Card>
+              <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary">
+                By signing in, you agree to our <Link to="/terms">Terms of Service</Link> and <Link to="/terms">Privacy Policy</Link>.
+                New accounts will be created automatically.
+              </div>
+            </motion.div>
+          </section>
+        </div>
       </main>
     </>
   );

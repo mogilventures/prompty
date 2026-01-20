@@ -7,6 +7,7 @@ import { DisplayNameStep } from "./steps/DisplayNameStep";
 import { AvatarStep } from "./steps/AvatarStep";
 import { CompletionStep } from "./steps/CompletionStep";
 import { useAuth } from "@/hooks/useAuth";
+import { AlertTriangle } from "lucide-react";
 
 // Avatar data interface
 interface AvatarData {
@@ -183,23 +184,13 @@ export function OnboardingWizard({ open, onComplete, onClose }: OnboardingWizard
         <div className="flex-1 overflow-y-auto p-4 sm:p-6">
           {/* Error display */}
           {error && (
-            <div className="rounded-lg bg-red-50 border border-red-200 p-4 mb-4">
+            <div className="border-2 border-destructive/30 bg-destructive/10 rounded-lg p-4 mb-4">
               <div className="flex">
                 <div className="flex-shrink-0">
-                  <svg
-                    className="h-5 w-5 text-red-400"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
+                  <AlertTriangle className="h-5 w-5 text-destructive" />
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm text-red-800">{error}</p>
+                  <p className="text-sm text-destructive">{error}</p>
                 </div>
               </div>
             </div>

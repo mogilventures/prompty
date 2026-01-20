@@ -14,11 +14,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Link, useNavigate } from "react-router-dom";
-import { DoorOpen, Grid3X3, LogOut, Plus } from "lucide-react";
+import { DoorOpen, Grid3X3, LogOut, Plus, Gamepad2, Trophy, ImageIcon, Percent, LucideIcon } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useCreateRoom, useJoinRoom } from "@/hooks/useRoom";
 import { toast } from "sonner";
+import { motion, useReducedMotion } from "framer-motion";
+import CountUp from "@/components/animation/CountUp";
 
 const mockStats = {
   gamesPlayed: 42,
@@ -42,6 +44,30 @@ const formatPlacement = (n: number) => {
   return `${n}th`;
 };
 
+const quickActions = [
+  {
+    number: "01",
+    icon: Plus,
+    title: "Create New Room",
+    description: "Start a new game",
+    action: "create",
+  },
+  {
+    number: "02",
+    icon: DoorOpen,
+    title: "Join Room",
+    description: "Enter a room code",
+    action: "join",
+  },
+  {
+    number: "03",
+    icon: Grid3X3,
+    title: "Public Rooms",
+    description: "Find a game to join",
+    action: "browse",
+  },
+];
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, isLoading } = useAuth();
@@ -50,6 +76,7 @@ const Dashboard = () => {
   const { handleJoinRoom: joinRoom } = useJoinRoom();
   const [showJoin, setShowJoin] = useState(false);
   const [roomCode, setRoomCode] = useState("");
+  const reduceMotion = useReducedMotion();
 
   // SEO
   const canonical = useMemo(
@@ -65,7 +92,7 @@ const Dashboard = () => {
       timePerRound: 90,
       isPrivate: false,
     });
-    
+
     if (!result.success && result.error) {
       toast.error(result.error);
     }
@@ -76,7 +103,7 @@ const Dashboard = () => {
       toast.error("Please enter a valid 6-character code (letters and numbers)");
       return;
     }
-    
+
     const result = await joinRoom(roomCode);
     if (!result.success) {
       toast.error(result.error || "Failed to join room");
@@ -90,6 +117,16 @@ const Dashboard = () => {
     navigate("/");
   };
 
+  const handleQuickAction = (action: string) => {
+    if (action === "create") {
+      handleCreateRoomClick();
+    } else if (action === "join") {
+      setShowJoin(true);
+    } else if (action === "browse") {
+      toast.info("Public Rooms coming soon!");
+    }
+  };
+
   // Use real user data or fallback to mock for stats
   const stats = user ? {
     gamesPlayed: user.gamesPlayed || 0,
@@ -98,6 +135,21 @@ const Dashboard = () => {
     winRate: user.gamesPlayed ? ((user.gamesWon || 0) / user.gamesPlayed * 100) : 0,
   } : mockStats;
   const recent = mockRecentGames; // Keep mock for now
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: reduceMotion ? 0 : 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: reduceMotion ? {} : { opacity: 0, y: 20 },
+    visible: reduceMotion ? {} : { opacity: 1, y: 0 },
+  };
 
   return (
     <>
@@ -114,175 +166,153 @@ const Dashboard = () => {
       <main className="container mx-auto pt-16 pb-10">
         <h1 className="sr-only">User Dashboard</h1>
 
-        {/* Page header with sign out */}
-        <section className="mb-6 flex items-center justify-between gap-4">
-          <div>
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={containerVariants}
+        >
+          {/* Page header with sign out */}
+          <motion.section
+            className="mb-6 flex items-center justify-between gap-4"
+            variants={itemVariants}
+          >
+            <div>
+              {isLoading ? (
+                <div className="space-y-2">
+                  <Skeleton className="h-6 w-40" />
+                  <Skeleton className="h-4 w-64" />
+                </div>
+              ) : (
+                <>
+                  <p className="text-sm text-muted-foreground">Welcome back</p>
+                  <p className="mt-1 text-2xl font-display font-semibold tracking-tight">
+                    {user?.username || user?.displayName || "User"}!
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {new Date().toLocaleString()}
+                  </p>
+                </>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="lg" onClick={handleSignOut} aria-label="Sign out">
+                <LogOut />
+                Sign Out
+              </Button>
+            </div>
+          </motion.section>
+
+          {/* Quick Actions */}
+          <motion.section aria-labelledby="quick-actions" className="mb-8" variants={itemVariants}>
+            <h2 id="quick-actions" className="mb-3 text-xl font-semibold">
+              Quick Actions
+            </h2>
+
             {isLoading ? (
-              <div className="space-y-2">
-                <Skeleton className="h-6 w-40" />
-                <Skeleton className="h-4 w-64" />
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <Skeleton className="h-32" />
+                <Skeleton className="h-32" />
+                <Skeleton className="h-32" />
               </div>
             ) : (
-              <>
-                <p className="text-sm text-muted-foreground">Welcome back</p>
-                <p className="mt-1 text-2xl font-semibold tracking-tight">
-                  {user?.username || user?.displayName || "User"}!
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  {new Date().toLocaleString()}
-                </p>
-              </>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {quickActions.map((action, index) => (
+                  <QuickActionCard
+                    key={action.action}
+                    number={action.number}
+                    icon={action.icon}
+                    title={action.title}
+                    description={action.description}
+                    onClick={() => handleQuickAction(action.action)}
+                    delay={reduceMotion ? 0 : index * 0.1}
+                    testId={action.action === "create" ? "create-room-button" : action.action === "join" ? "join-room-button" : undefined}
+                  />
+                ))}
+              </div>
             )}
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="lg" onClick={handleSignOut} aria-label="Sign out">
-              <LogOut />
-              Sign Out
-            </Button>
-          </div>
-        </section>
+          </motion.section>
 
-        {/* Quick Actions */}
-        <section aria-labelledby="quick-actions" className="mb-8">
-          <h2 id="quick-actions" className="mb-3 text-xl font-semibold">
-            Quick Actions
-          </h2>
-
-          {isLoading ? (
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-              <Skeleton className="h-32" />
-              <Skeleton className="h-32" />
-              <Skeleton className="h-32" />
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-              <Card className="transition-transform hover:-translate-x-px hover:-translate-y-px">
-                <button
-                  onClick={handleCreateRoomClick}
-                  className="flex h-full w-full flex-col items-start p-6 text-left"
-                  aria-label="Create a new room"
-                  data-testid="create-room-button"
-                >
-                  <div className="mb-3 inline-flex h-10 w-10 items-center justify-center border-2">
-                    <Plus />
-                  </div>
-                  <CardTitle>Create New Room</CardTitle>
-                  <CardDescription>Start a new game</CardDescription>
-                </button>
-              </Card>
-
-              <Card className="transition-transform hover:-translate-x-px hover:-translate-y-px">
-                <button
-                  onClick={() => setShowJoin(true)}
-                  className="flex h-full w-full flex-col items-start p-6 text-left"
-                  aria-label="Join a room"
-                  data-testid="join-room-button"
-                >
-                  <div className="mb-3 inline-flex h-10 w-10 items-center justify-center border-2">
-                    <DoorOpen />
-                  </div>
-                  <CardTitle>Join Room</CardTitle>
-                  <CardDescription>Enter a room code</CardDescription>
-                </button>
-              </Card>
-
-              <Card className="transition-transform hover:-translate-x-px hover:-translate-y-px">
-                <button
-                  onClick={() => toast.info("Public Rooms coming soon!")}
-                  className="flex h-full w-full flex-col items-start p-6 text-left"
-                  aria-label="Browse public rooms"
-                >
-                  <div className="mb-3 inline-flex h-10 w-10 items-center justify-center border-2">
-                    <Grid3X3 />
-                  </div>
-                  <CardTitle>Public Rooms</CardTitle>
-                  <CardDescription>Find a game to join</CardDescription>
-                </button>
-              </Card>
-            </div>
-          )}
-        </section>
-
-        {/* Stats */}
-        <section aria-labelledby="stats" className="mb-8">
-          <h2 id="stats" className="mb-3 text-xl font-semibold">
-            Your Stats
-          </h2>
-          {isLoading ? (
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 lg:grid-cols-4">
-              <Skeleton className="h-24" />
-              <Skeleton className="h-24" />
-              <Skeleton className="h-24" />
-              <Skeleton className="h-24" />
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 lg:grid-cols-4">
-              <StatCard label="Games Played" value={stats.gamesPlayed} />
-              <StatCard label="Games Won" value={stats.gamesWon} />
-              <StatCard label="Images Created" value={stats.imagesCreated} />
-              <StatCard label="Win Rate" value={`${stats.winRate}%`} />
-            </div>
-          )}
-        </section>
-
-        {/* Recent Games */}
-        <section aria-labelledby="recent" className="mb-8">
-          <div className="mb-3 flex items-center justify-between">
-            <h2 id="recent" className="text-lg font-medium">
-              Recent Games
+          {/* Stats */}
+          <motion.section aria-labelledby="stats" className="mb-8" variants={itemVariants}>
+            <h2 id="stats" className="mb-3 text-xl font-semibold">
+              Your Stats
             </h2>
-            {!isLoading && (
-              <Link to="#" className="story-link text-sm">
-                View all
-              </Link>
+            {isLoading ? (
+              <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                <Skeleton className="h-24" />
+                <Skeleton className="h-24" />
+                <Skeleton className="h-24" />
+                <Skeleton className="h-24" />
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                <StatCard icon={Gamepad2} label="Games Played" value={stats.gamesPlayed} delay={reduceMotion ? 0 : 0.2} />
+                <StatCard icon={Trophy} label="Games Won" value={stats.gamesWon} delay={reduceMotion ? 0 : 0.3} />
+                <StatCard icon={ImageIcon} label="Images Created" value={stats.imagesCreated} delay={reduceMotion ? 0 : 0.4} />
+                <StatCard icon={Percent} label="Win Rate" value={stats.winRate} suffix="%" delay={reduceMotion ? 0 : 0.5} />
+              </div>
             )}
-          </div>
+          </motion.section>
 
-          {isLoading ? (
-            <div className="space-y-3">
-              <Skeleton className="h-16" />
-              <Skeleton className="h-16" />
-              <Skeleton className="h-16" />
+          {/* Recent Games */}
+          <motion.section aria-labelledby="recent" className="mb-8" variants={itemVariants}>
+            <div className="mb-3 flex items-center justify-between">
+              <h2 id="recent" className="text-lg font-medium">
+                Recent Games
+              </h2>
+              {!isLoading && (
+                <Link to="#" className="story-link text-sm">
+                  View all
+                </Link>
+              )}
             </div>
-          ) : recent.length === 0 ? (
-            <Card>
-              <CardContent className="p-6">
-                <p className="text-sm text-muted-foreground">
-                  No games yet. Create a room to get started!
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="divide-y">
-              {recent.map((g) => (
-                <article key={g.id} className="py-4">
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="space-y-1">
-                      <h3 className="text-base font-medium">
-                        {new Date(g.date).toLocaleDateString(undefined, {
-                          year: "numeric",
-                          month: "short",
-                          day: "2-digit",
-                        })}
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        {g.players} players • {formatPlacement(g.placement)} place
-                      </p>
+
+            {isLoading ? (
+              <div className="space-y-3">
+                <Skeleton className="h-16" />
+                <Skeleton className="h-16" />
+                <Skeleton className="h-16" />
+              </div>
+            ) : recent.length === 0 ? (
+              <Card>
+                <CardContent className="p-6">
+                  <p className="text-sm text-muted-foreground">
+                    No games yet. Create a room to get started!
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="divide-y">
+                {recent.map((g) => (
+                  <article key={g.id} className="py-4">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="space-y-1">
+                        <h3 className="text-base font-medium">
+                          {new Date(g.date).toLocaleDateString(undefined, {
+                            year: "numeric",
+                            month: "short",
+                            day: "2-digit",
+                          })}
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                          {g.players} players • {formatPlacement(g.placement)} place
+                        </p>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => toast.info("Game details coming soon!")}
+                        aria-label="View game details"
+                      >
+                        View details
+                      </Button>
                     </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => toast.info("Game details coming soon!")}
-                      aria-label="View game details"
-                    >
-                      View details
-                    </Button>
-                  </div>
-                </article>
-              ))}
-            </div>
-          )}
-        </section>
+                  </article>
+                ))}
+              </div>
+            )}
+          </motion.section>
+        </motion.div>
       </main>
 
       {/* Join Room Modal */}
@@ -321,14 +351,97 @@ const Dashboard = () => {
   );
 };
 
-function StatCard({ label, value }: { label: string; value: number | string }) {
+interface StatCardProps {
+  icon: LucideIcon;
+  label: string;
+  value: number;
+  suffix?: string;
+  delay?: number;
+}
+
+function StatCard({ icon: Icon, label, value, suffix = "", delay = 0 }: StatCardProps) {
+  const reduceMotion = useReducedMotion();
+
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardDescription>{label}</CardDescription>
-        <CardTitle className="text-2xl">{value}</CardTitle>
-      </CardHeader>
-    </Card>
+    <motion.div
+      initial={reduceMotion ? undefined : { opacity: 0, y: 20, scale: 0.95 }}
+      animate={reduceMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
+      transition={{
+        duration: 0.5,
+        delay,
+        ease: [0.25, 0.46, 0.45, 0.94],
+      }}
+    >
+      <Card className="group relative overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-lg motion-reduce:transform-none">
+        {/* Corner pixel decorations */}
+        <div className="absolute top-0 left-0 w-1.5 h-1.5 bg-foreground/60 -translate-x-px -translate-y-px" aria-hidden="true" />
+        <div className="absolute top-0 right-0 w-1.5 h-1.5 bg-foreground/60 translate-x-px -translate-y-px" aria-hidden="true" />
+        <div className="absolute bottom-0 left-0 w-1.5 h-1.5 bg-foreground/60 -translate-x-px translate-y-px" aria-hidden="true" />
+        <div className="absolute bottom-0 right-0 w-1.5 h-1.5 bg-foreground/60 translate-x-px translate-y-px" aria-hidden="true" />
+
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-8 h-8 bg-primary/10 flex items-center justify-center rounded">
+              <Icon className="h-4 w-4 text-primary transition-transform duration-200 group-hover:scale-110" />
+            </div>
+          </div>
+          <CardDescription>{label}</CardDescription>
+          <CardTitle className="text-2xl font-display">
+            <CountUp end={value} delay={delay + 0.2} />
+            {suffix}
+          </CardTitle>
+        </CardHeader>
+      </Card>
+    </motion.div>
+  );
+}
+
+interface QuickActionCardProps {
+  number: string;
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  onClick: () => void;
+  delay?: number;
+  testId?: string;
+}
+
+function QuickActionCard({ number, icon: Icon, title, description, onClick, delay = 0, testId }: QuickActionCardProps) {
+  const reduceMotion = useReducedMotion();
+
+  return (
+    <motion.div
+      initial={reduceMotion ? undefined : { opacity: 0, y: 20 }}
+      animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+      transition={{
+        duration: 0.5,
+        delay,
+        ease: [0.25, 0.46, 0.45, 0.94],
+      }}
+    >
+      <Card className="relative transition-all duration-200 hover:-translate-y-1 hover:shadow-lg motion-reduce:transform-none">
+        {/* Step number badge */}
+        <div
+          className="absolute -top-3 -left-3 w-10 h-10 bg-primary text-primary-foreground font-display text-sm flex items-center justify-center border-2 border-background shadow-md z-20"
+          aria-hidden="true"
+        >
+          {number}
+        </div>
+
+        <button
+          onClick={onClick}
+          className="flex h-full w-full flex-col items-start p-6 pt-8 text-left"
+          aria-label={title}
+          data-testid={testId}
+        >
+          <div className="mb-3 w-12 h-12 border-2 border-primary/30 bg-primary/5 rounded flex items-center justify-center">
+            <Icon className="h-6 w-6 text-primary" />
+          </div>
+          <CardTitle>{title}</CardTitle>
+          <CardDescription>{description}</CardDescription>
+        </button>
+      </Card>
+    </motion.div>
   );
 }
 

@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/8bit/c
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Copy, Share2, Crown, Loader2, Users, Play, Settings, UserX, LogOut, Clock } from "lucide-react";
+import { Copy, Share2, Crown, Loader2, Users, Play, Settings, UserX, LogOut, Clock, Check } from "lucide-react";
 import { toast } from "sonner";
 import RoomSettings from "@/components/room/RoomSettings";
 import RoomSettingsDialog from "@/components/room/RoomSettingsDialog";
@@ -17,7 +17,7 @@ import { useRoom } from "@/hooks/useRoom";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 
 const Room = () => {
   // Get roomId from URL params
@@ -43,6 +43,7 @@ const Room = () => {
   // State for UI
   const [showSettings, setShowSettings] = useState(false);
   const [copied, setCopied] = useState(false);
+  const reduceMotion = useReducedMotion();
   
   // Only show username dialog if user is authenticated but doesn't have username
   const showUsernameDialog = !userLoading && isAuthenticated && user && !user.username;
@@ -170,38 +171,78 @@ const Room = () => {
         <h1 className="sr-only">Room Lobby {room.code}</h1>
 
         {/* Room Header Card */}
-        <Card className="mb-6">
-          <CardHeader>
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div>
-                <CardTitle className="text-2xl">{room.name}</CardTitle>
-                <div className="flex items-center gap-2 mt-2">
-                  <Badge
-                    variant="outline"
-                    className="text-lg px-4 py-2 font-mono cursor-pointer"
-                    onClick={handleCopyCode}
-                    data-testid="room-code"
-                  >
-                    {room.code}
-                  </Badge>
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    onClick={handleCopyCode}
-                    aria-label="Copy Code"
-                  >
-                    <Copy className={`h-4 w-4 ${copied ? 'scale-125' : ''}`} />
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    onClick={handleShareLink}
-                    aria-label="Share Link"
-                  >
-                    <Share2 className="h-4 w-4" />
-                  </Button>
+        <motion.div
+          initial={reduceMotion ? undefined : { opacity: 0, y: 20 }}
+          animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+        >
+          <Card className="mb-6 relative">
+            {/* Corner pixel decorations */}
+            <div className="absolute top-0 left-0 w-1.5 h-1.5 bg-foreground/60 -translate-x-px -translate-y-px" aria-hidden="true" />
+            <div className="absolute top-0 right-0 w-1.5 h-1.5 bg-foreground/60 translate-x-px -translate-y-px" aria-hidden="true" />
+            <div className="absolute bottom-0 left-0 w-1.5 h-1.5 bg-foreground/60 -translate-x-px translate-y-px" aria-hidden="true" />
+            <div className="absolute bottom-0 right-0 w-1.5 h-1.5 bg-foreground/60 translate-x-px translate-y-px" aria-hidden="true" />
+
+            <CardHeader>
+              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div>
+                  <CardTitle className="text-2xl font-display">{room.name}</CardTitle>
+                  <div className="flex items-center gap-2 mt-3">
+                    {/* Enhanced Room Code Badge */}
+                    <motion.div
+                      className="relative group"
+                      whileHover={reduceMotion ? undefined : { scale: 1.02 }}
+                      whileTap={reduceMotion ? undefined : { scale: 0.98 }}
+                    >
+                      <button
+                        onClick={handleCopyCode}
+                        className="relative px-5 py-3 bg-primary/5 border-2 border-primary/30 hover:border-primary/50 hover:bg-primary/10 transition-all duration-200 font-mono text-xl tracking-[0.15em] font-bold cursor-pointer"
+                        data-testid="room-code"
+                        aria-label={`Room code: ${room.code}. Click to copy.`}
+                      >
+                        {/* Corner decorations on badge */}
+                        <div className="absolute top-0 left-0 w-1 h-1 bg-primary/60 -translate-x-px -translate-y-px" aria-hidden="true" />
+                        <div className="absolute top-0 right-0 w-1 h-1 bg-primary/60 translate-x-px -translate-y-px" aria-hidden="true" />
+                        <div className="absolute bottom-0 left-0 w-1 h-1 bg-primary/60 -translate-x-px translate-y-px" aria-hidden="true" />
+                        <div className="absolute bottom-0 right-0 w-1 h-1 bg-primary/60 translate-x-px translate-y-px" aria-hidden="true" />
+
+                        <span className="text-foreground">{room.code}</span>
+
+                        {/* Copy indicator */}
+                        <AnimatePresence>
+                          {copied && (
+                            <motion.span
+                              initial={{ opacity: 0, scale: 0.5 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              exit={{ opacity: 0, scale: 0.5 }}
+                              className="absolute -top-2 -right-2 w-5 h-5 bg-success text-success-foreground rounded-full flex items-center justify-center"
+                            >
+                              <Check className="w-3 h-3" />
+                            </motion.span>
+                          )}
+                        </AnimatePresence>
+                      </button>
+                    </motion.div>
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      onClick={handleCopyCode}
+                      aria-label="Copy Code"
+                      className="h-12 w-12"
+                    >
+                      <Copy className={`h-4 w-4 transition-transform duration-200 ${copied ? 'scale-110 text-success' : ''}`} />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      onClick={handleShareLink}
+                      aria-label="Share Link"
+                      className="h-12 w-12"
+                    >
+                      <Share2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
               
               <div className="flex gap-2">
                 {isHost && (
@@ -224,6 +265,7 @@ const Room = () => {
             </div>
           </CardHeader>
         </Card>
+        </motion.div>
 
         {isFull && (
           <motion.div 
