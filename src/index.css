@@ -9,26 +9,32 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Warm cream instead of pure white */
+    --background: 45 25% 96%;
+    --foreground: 150 10% 15%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    /* Warm-tinted surfaces with green hint */
+    --card: 80 15% 94%;
+    --card-foreground: 150 10% 15%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 80 15% 94%;
+    --popover-foreground: 150 10% 15%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Neon green accent (consistent with dark mode terminal) */
+    --primary: 84 85% 45%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Warm secondary */
+    --secondary: 80 20% 92%;
+    --secondary-foreground: 150 10% 15%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Muted with green tint */
+    --muted: 80 10% 91%;
+    --muted-foreground: 150 15% 40%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Cyan secondary (complements green) */
+    --accent: 175 75% 40%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
@@ -38,27 +44,21 @@ All colors MUST be HSL.
     --warning: 45 100% 50%;
     --warning-foreground: 0 0% 0%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Border with green tint */
+    --border: 120 15% 80%;
+    --input: 120 15% 80%;
+    --ring: 84 85% 45%;
 
     --radius: 0.5rem;
 
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 45 25% 96%;
+    --sidebar-foreground: 150 10% 25%;
+    --sidebar-primary: 84 85% 45%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 80 15% 92%;
+    --sidebar-accent-foreground: 150 10% 15%;
+    --sidebar-border: 120 15% 82%;
+    --sidebar-ring: 84 85% 45%;
   }
 
 .dark {
@@ -114,7 +114,7 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
     font-family: 'VT323', monospace;
     background-color: hsl(var(--background));
-    background-image: radial-gradient(circle at 1px 1px, hsl(var(--grid-dot) / 0.15) 1px, transparent 1px);
+    background-image: radial-gradient(circle at 1px 1px, hsl(var(--grid-dot) / 0.25) 1px, transparent 1px);
     background-size: 24px 24px;
     background-attachment: fixed;
     font-size: 18px; /* VT323 needs slightly larger size for optimal readability */
@@ -131,10 +131,12 @@ All colors MUST be HSL.
 /* Additional semantic tokens for monochrome hero and surfaces */
 @layer base {
   :root {
-    --hero-start: 0 0% 100%;
-    --hero-end: 0 0% 92%;
-    --surface-muted: 0 0% 96%;
-    --grid-dot: 210 10% 80%;
+    /* Hero gradient - cream to light green tint */
+    --hero-start: 45 25% 96%;
+    --hero-end: 100 25% 92%;
+    --surface-muted: 80 10% 94%;
+    /* Green-tinted grid dots (more visible) */
+    --grid-dot: 120 40% 55%;
     --timer-safe: 120 50% 50%;
     --timer-warning: 45 100% 60%;
     --timer-danger: 0 100% 60%;
@@ -217,6 +219,20 @@ All colors MUST be HSL.
   .animate-easter-spin {
     animation: easter-spin 1s ease-in-out;
   }
+  /* Float animation variants */
+  .animate-float-slow {
+    animation: float 8s ease-in-out infinite;
+  }
+  .animate-float-medium {
+    animation: float 6s ease-in-out infinite;
+  }
+  .animate-float-fast {
+    animation: float 4s ease-in-out infinite;
+  }
+  /* Stat pulse animation */
+  .animate-stat-pulse {
+    animation: stat-pulse 2s ease-in-out infinite;
+  }
 }
 
 /* Simple checkerboard background utility using design tokens */
@@ -229,7 +245,7 @@ All colors MUST be HSL.
   }
   .bg-grid-dots {
     background-color: hsl(var(--background));
-    background-image: radial-gradient(circle at 1px 1px, hsl(var(--grid-dot) / 0.15) 1px, transparent 1px);
+    background-image: radial-gradient(circle at 1px 1px, hsl(var(--grid-dot) / 0.25) 1px, transparent 1px);
     background-size: 24px 24px;
   }
 }
