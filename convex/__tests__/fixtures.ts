@@ -12,6 +12,168 @@ import { v } from "convex/values";
 import { internal } from "../_generated/api";
 import { Id } from "../_generated/dataModel";
 
+// ==========================================
+// Pure helper functions for unit tests
+// ==========================================
+
+let idCounter = 0;
+
+export function resetIdCounter(): void {
+  idCounter = 0;
+}
+
+export function generateId<T extends string>(tableName: T): Id<T> {
+  idCounter++;
+  return `test_${tableName}_${idCounter}` as Id<T>;
+}
+
+interface MockPlayer {
+  _id: Id<"players">;
+  _creationTime: number;
+  roomId: Id<"rooms">;
+  userId: Id<"users">;
+  status: "connected" | "disconnected" | "kicked";
+  isHost: boolean;
+  score: number;
+  joinedAt: number;
+  lastSeenAt: number;
+}
+
+export function createPlayer(options: {
+  roomId: Id<"rooms">;
+  status?: "connected" | "disconnected" | "kicked";
+  isHost?: boolean;
+  score?: number;
+}): MockPlayer {
+  return {
+    _id: generateId("players"),
+    _creationTime: Date.now(),
+    roomId: options.roomId,
+    userId: generateId("users"),
+    status: options.status ?? "connected",
+    isHost: options.isHost ?? false,
+    score: options.score ?? 0,
+    joinedAt: Date.now(),
+    lastSeenAt: Date.now(),
+  };
+}
+
+interface MockPrompt {
+  _id: Id<"prompts">;
+  _creationTime: number;
+  roundId: Id<"rounds">;
+  playerId: Id<"players">;
+  text: string;
+  submittedAt: number;
+}
+
+export function createPrompt(
+  playerId: Id<"players">,
+  roundId: Id<"rounds">,
+  text?: string
+): MockPrompt {
+  return {
+    _id: generateId("prompts"),
+    _creationTime: Date.now(),
+    roundId,
+    playerId,
+    text: text ?? `Test prompt by ${playerId}`,
+    submittedAt: Date.now(),
+  };
+}
+
+interface MockGeneratedImage {
+  _id: Id<"generatedImages">;
+  _creationTime: number;
+  promptId: Id<"prompts">;
+  imageUrl: string;
+  generatedAt: number;
+  metadata: {
+    model: string;
+    timestamp: number;
+    generatedAt: number;
+  };
+}
+
+export function createGeneratedImage(promptId: Id<"prompts">): MockGeneratedImage {
+  return {
+    _id: generateId("generatedImages"),
+    _creationTime: Date.now(),
+    promptId,
+    imageUrl: `https://placeholder.com/test-image-${promptId}`,
+    generatedAt: Date.now(),
+    metadata: {
+      model: "test/placeholder",
+      timestamp: Date.now(),
+      generatedAt: Date.now(),
+    },
+  };
+}
+
+interface MockVote {
+  _id: Id<"votes">;
+  _creationTime: number;
+  roundId: Id<"rounds">;
+  voterId: Id<"players">;
+  imageId: Id<"generatedImages">;
+  submittedAt: number;
+}
+
+export function createVote(
+  voterId: Id<"players">,
+  imageId: Id<"generatedImages">,
+  roundId: Id<"rounds">
+): MockVote {
+  return {
+    _id: generateId("votes"),
+    _creationTime: Date.now(),
+    roundId,
+    voterId,
+    imageId,
+    submittedAt: Date.now(),
+  };
+}
+
+interface GameScenario {
+  roomId: Id<"rooms">;
+  roundId: Id<"rounds">;
+  players: MockPlayer[];
+  prompts: MockPrompt[];
+  images: MockGeneratedImage[];
+}
+
+export function createGameScenario(playerCount: number): GameScenario {
+  const roomId = generateId("rooms");
+  const roundId = generateId("rounds");
+
+  const players: MockPlayer[] = [];
+  const prompts: MockPrompt[] = [];
+  const images: MockGeneratedImage[] = [];
+
+  for (let i = 0; i < playerCount; i++) {
+    const player = createPlayer({ roomId, isHost: i === 0 });
+    players.push(player);
+
+    const prompt = createPrompt(player._id, roundId, `Test prompt ${i + 1}`);
+    prompts.push(prompt);
+
+    const image = createGeneratedImage(prompt._id);
+    images.push(image);
+  }
+
+  return {
+    roomId,
+    roundId,
+    players,
+    prompts,
+    images,
+  };
+}
+
+// ==========================================
+// Convex internal functions for integration tests
+// ==========================================
+
 // Test mode timing configuration (much faster than real game)
 export const TEST_MODE_CONFIG = {
   PROMPT_PHASE_DURATION: 1000, // 1 second
