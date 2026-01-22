@@ -10,7 +10,7 @@
 import { internalMutation, internalQuery } from "../_generated/server";
 import { v } from "convex/values";
 import { internal } from "../_generated/api";
-import { Id } from "../_generated/dataModel";
+import { Id, TableNames } from "../_generated/dataModel";
 
 // ==========================================
 // Pure helper functions for unit tests
@@ -22,7 +22,7 @@ export function resetIdCounter(): void {
   idCounter = 0;
 }
 
-export function generateId<T extends string>(tableName: T): Id<T> {
+export function generateId<T extends TableNames>(tableName: T): Id<T> {
   idCounter++;
   return `test_${tableName}_${idCounter}` as Id<T>;
 }
