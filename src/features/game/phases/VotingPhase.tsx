@@ -366,14 +366,14 @@ const VotingPhase: React.FC<VotingPhaseProps> = ({
               exit={{ scale: 0.8, opacity: 0 }}
             >
               <CardShadow>
-                <Card className="p-6 max-w-md text-center space-y-4">
+                <Card className="p-6 max-w-lg text-center space-y-4">
                   <Check className="w-12 h-12 text-primary mx-auto" />
                   <h3 className="text-lg font-display">Confirm Your Vote</h3>
                   <p className="text-sm text-muted-foreground">
                     Are you sure you want to vote for this image?
                   </p>
                   {pendingVote && (
-                    <div className="aspect-square w-32 mx-auto border-2 border-foreground rounded-none overflow-hidden">
+                    <div className="aspect-square w-64 sm:w-72 mx-auto border-2 border-foreground rounded-none overflow-hidden">
                       {(() => {
                         const pendingImage = imagesToShow.find(img => img._id === pendingVote);
                         return pendingImage ? (
